@@ -47,7 +47,7 @@ Das Ergebnis ist `-9223372036854775808`, auf Grund eines Overflows.
 
 ## Aufgabe b
 
-Funktionsnamen müssen kleingeschrieben werden.
+Funktionsnamen müssen kleingeschrieben werden und das `where` muss eingerückt sein.
 
 ```
 n = a `div` length xs
