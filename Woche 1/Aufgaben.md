@@ -47,7 +47,7 @@ Das Ergebnis ist `-9223372036854775808`, auf Grund eines Overflows.
 
 ## Aufgabe b
 
-Funktionsnamen müssen kleingeschrieben werden.
+Funktionsnamen müssen kleingeschrieben werden und das `where` muss eingerückt sein.
 
 ```
 n = a `div` length xs
@@ -105,8 +105,8 @@ parseFile input =
     let
         fileLines = lines input
         charCount = show $ length input
-        wordCount = show . length . words . unwords $ fileLines
-        secondLine = if (length fileLines >= 2) then fileLines!!1 else ""
+        wordCount = show . length . words $ input
+        secondLine = if (length fileLines >= 2) then fileLines !! 1 else ""
         secondLineLength = show . length $ secondLine
     in charCount ++ " characters\n" ++ wordCount ++ " words\nSecond line: " ++ secondLine ++ "\n" ++ secondLineLength ++ " characters on the second line\n"
 ```
