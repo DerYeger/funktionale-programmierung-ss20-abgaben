@@ -59,7 +59,7 @@ n = a `div` length xs
 ## Aufgabe c
 
 Die vorletzte Zeile ist kein gültiger Code, da die unäre Funktion `myAdd` ein Argument des Typs `(Int, Int)` erwartet und nur `Int` bekommt.
-Die letzte Zeile ist hingegen gültig, da es sich um eine partielle Applikation handelt. Diese ist möglich, da `add` den Typ `Int -> Int -> Int` hat. Das Resuktat der partiellen Applikation hat also den Typ `Int -> Int` und berechnet die Funktion `add 1 y`, der Parameter x wird also eingefroren.
+Die letzte Zeile ist hingegen gültig, da es sich um eine partielle Applikation handelt. Diese ist möglich, da `add` den Typ `Int -> Int -> Int` hat. Das Resultat der partiellen Applikation hat also den Typ `Int -> Int` und berechnet die Funktion `add 1 y`, der Parameter x wird also eingefroren.
 
 ## Aufgabe d
 
