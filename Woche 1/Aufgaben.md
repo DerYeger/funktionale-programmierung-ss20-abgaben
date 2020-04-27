@@ -47,7 +47,7 @@ Das Ergebnis ist `-9223372036854775808`, auf Grund eines Overflows.
 
 ## Aufgabe b
 
-Funktionsnamen müssen kleingeschrieben werden.
+Funktionsnamen müssen kleingeschrieben werden und das `where` muss eingerückt sein.
 
 ```
 n = a `div` length xs
@@ -59,7 +59,7 @@ n = a `div` length xs
 ## Aufgabe c
 
 Die vorletzte Zeile ist kein gültiger Code, da die unäre Funktion `myAdd` ein Argument des Typs `(Int, Int)` erwartet und nur `Int` bekommt.
-Die letzte Zeile ist hingegen gültig, da es sich um eine partielle Applikation handelt. Diese ist möglich, da `add` den Typ `Int -> Int -> Int` hat. Das Resuktat der partiellen Applikation hat also den Typ `Int -> Int` und berechnet die Funktion `add 1 y`, der Parameter x wird also eingefroren.
+Die letzte Zeile ist hingegen gültig, da es sich um eine partielle Applikation handelt. Diese ist möglich, da `add` den Typ `Int -> Int -> Int` hat. Das Resultat der partiellen Applikation hat also den Typ `Int -> Int` und berechnet die Funktion `add 1 y`, der Parameter x wird also eingefroren.
 
 ## Aufgabe d
 
@@ -105,8 +105,8 @@ parseFile input =
     let
         fileLines = lines input
         charCount = show $ length input
-        wordCount = show . length . words . unwords $ fileLines
-        secondLine = if (length fileLines >= 2) then fileLines!!1 else ""
+        wordCount = show . length . words $ input
+        secondLine = if (length fileLines >= 2) then fileLines !! 1 else ""
         secondLineLength = show . length $ secondLine
     in charCount ++ " characters\n" ++ wordCount ++ " words\nSecond line: " ++ secondLine ++ "\n" ++ secondLineLength ++ " characters on the second line\n"
 ```
