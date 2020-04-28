@@ -8,15 +8,12 @@ one2two list = (everySecond list, everySecond . safeTail $ list)
         everySecond [] = []
         everySecond (first:rest) = first:(everySecond . safeTail $ rest)              
 
-merge :: Ord a => [a] -> [a] -> [a]
-merge [] secondList = secondList
-merge firstList [] = firstList
-merge firstList secondList
-    | firstHead <= secondHead = firstHead:(merge firstRest secondList)
-    | otherwise = secondHead:(merge firstList secondRest)
-        where 
-            (firstHead:firstRest) = firstList
-            (secondHead:secondRest) = secondList
+merge :: (Ord a) => [a] -> [a] -> [a]
+merge xs [] = xs
+merge [] ys = ys 
+merge (x:xs) (y:ys) 
+    | x < y = x:merge xs (y:ys)
+    | otherwise = y:merge (x:xs) ys
 
 mergesort :: Ord a => [a] -> [a]
 mergesort list =
