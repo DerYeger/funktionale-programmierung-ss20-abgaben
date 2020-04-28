@@ -15,13 +15,13 @@ merge (x:xs) (y:ys)
     | x < y = x:merge xs (y:ys)
     | otherwise = y:merge (x:xs) ys
 
-mergesort :: Ord a => [a] -> [a]
-mergesort list =
-    case list of
-        [] -> []
-        [a] -> [a]
-        otherwise -> merge (mergesort $ take half list) (mergesort $ drop half list)
-            where half = (length list) `div` 2
+mergesort :: (Ord a) => [a] -> [a]
+mergesort xs 
+        | (length xs) <= 1 = xs
+        | otherwise = merge (mergesort ls) (mergesort rs)
+        where
+            ls = take ((length xs) `div` 2) xs
+            rs = drop ((length xs) `div` 2) xs
 
 remove_ao :: String -> String
 remove_ao input = map (\char -> if (char `elem` ['a', 'o']) then '_' else char) input
