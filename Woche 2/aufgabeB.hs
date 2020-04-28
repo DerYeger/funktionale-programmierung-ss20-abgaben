@@ -37,3 +37,12 @@ removeDuplicates [] = []
 removeDuplicates (x:xs)
     | x `elem` xs = removeDuplicates xs
     | otherwise = x:(removeDuplicates xs)
+    
+mergesort_let :: (Ord a) => [a] -> [a]
+mergesort_let xs 
+        | (length xs) <= 1 = xs
+        | otherwise = 
+            let
+                ls = take ((length xs) `div` 2) xs
+                rs = drop ((length xs) `div` 2) xs
+            in merge (mergesort_let ls) (mergesort_let rs)
