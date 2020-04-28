@@ -15,10 +15,10 @@ pair2List (first, second) = [first, second]
 makeTripel :: a -> b -> c -> (a, b, c)
 makeTripel a b c = (a, b, c)
 
-makeTripelV0 :: Num c => a -> b -> (c, a, b)
-makeTripelV0 a b = makeTripel 0 a b
+makeTripelV0 :: a -> b -> (Integer, a, b)
+makeTripelV0 = makeTripel 0
 
-makeTripelM1 :: Num c => a -> b -> (a, c, b)
+makeTripelM1 :: a -> b -> (a, Integer, b)
 makeTripelM1 a b = makeTripel a 1 b
 
 withFst :: (a -> c) -> (a, b) -> (c, b)
