@@ -40,12 +40,3 @@ removeDuplicates list =
             then helper tail acc -- element is a duplicate so we ignore it
             else helper tail (head:acc) -- element is new so we add it to the accumulator
     in reverse $ helper list []
-    
-mergesort_let :: (Ord a) => [a] -> [a]
-mergesort_let xs 
-        | (length xs) <= 1 = xs
-        | otherwise = 
-            let
-                ls = take ((length xs) `div` 2) xs
-                rs = drop ((length xs) `div` 2) xs
-            in merge (mergesort_let ls) (mergesort_let rs)
