@@ -3,10 +3,10 @@ safetail [] = []
 safetail (head:list) = list
 
 one2two :: [a] -> ([a], [a])
-one2two list = (everySecond list, everySecond . safeTail $ list)
+one2two list = (everySecond list, everySecond . safetail $ list)
     where 
         everySecond [] = []
-        everySecond (first:rest) = first:(everySecond . safeTail $ rest)              
+        everySecond (first:rest) = first:(everySecond . safetail $ rest)              
 
 merge :: (Ord a) => [a] -> [a] -> [a]
 merge xs [] = xs
