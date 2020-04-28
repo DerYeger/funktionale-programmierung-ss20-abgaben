@@ -24,7 +24,7 @@ mergesort xs
             rs = drop ((length xs) `div` 2) xs
 
 remove_ao :: String -> String
-remove_ao input = map (\char -> if (char `elem` ['a', 'o']) then '_' else char) input
+remove_ao input = map (\c -> if c=='a' || c=='o' then '_' else c) input
 
 reversePairList :: [(a, b)] -> [(b, a)]
 reversePairList list = reverse [(b, a) | (a, b) <- list]
@@ -32,12 +32,8 @@ reversePairList list = reverse [(b, a) | (a, b) <- list]
 remove_01 :: [(Int, Int)] -> [(Int, Int)]
 remove_01 list = filter (\(first, second) -> first /= 0 && second /= 1) list
 
-removeDuplicates :: Eq a => [a] -> [a]
-removeDuplicates list = 
-    let
-        helper [] acc = acc
-        helper (head:tail) acc = if (head `elem` acc)
-            then helper tail acc -- element is a duplicate so we ignore it
-            else helper tail (head:acc) -- element is new so we add it to the accumulator
-    in
-        reverse $ helper list []
+removeDuplicates :: (Eq a) => [a] -> [a]
+removeDuplicates [] = []
+removeDuplicates (x:xs)
+    | x `elem` xs = removeDuplicates xs
+    | otherwise = x:(removeDuplicates xs)
