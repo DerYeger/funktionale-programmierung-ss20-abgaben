@@ -1,6 +1,6 @@
-safeTail :: [a] -> [a]
-safeTail [] = []
-safeTail (head:list) = list
+safetail :: [a] -> [a]
+safetail [] = []
+safetail (head:list) = list
 
 one2two :: [a] -> ([a], [a])
 one2two list = (everySecond list, everySecond . safeTail $ list)
