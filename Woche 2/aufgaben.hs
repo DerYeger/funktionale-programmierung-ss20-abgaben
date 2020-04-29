@@ -81,4 +81,4 @@ removeDuplicates list =
     
 -- Aufgabe c
 
--- Es wurden alle Sprachkosntrukte aus b) (if-else, Wächter, Mustererkennung ohne case, Mustererkennung mit case, anonyme Funktion, where, let, Eigenschaftsliste, filter, Verkettung von Funktionen (Operator “.”), map, $) verwendet. Daher werden hier keine weiteren Funktionen implementiert. 
+-- Es wurden alle Sprachkonstrukte aus b) (if-else, Wächter, Mustererkennung ohne case, Mustererkennung mit case, anonyme Funktion, where, let, Eigenschaftsliste, filter, Verkettung von Funktionen (Operator “.”), map, $) verwendet. Daher werden hier keine weiteren Funktionen implementiert. 
