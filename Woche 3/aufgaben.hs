@@ -28,5 +28,6 @@ countElem x = foldr count 0
 -- myId [1, 3, 5, 7, 9, 8, 6, 4, 2, 0]
 
 myId :: [a] -> [a]
-myId = foldr reconstruct []
-    where reconstruct y acc = y:acc
+myId = foldr (:) []
+
+-- Aufgabe d
