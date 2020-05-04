@@ -12,3 +12,7 @@ someFunction = replicate 2 . product . map (*3) $ zipWith max [1, 2] [4, 5]
 
 myConcat :: [String] -> String
 myConcat = foldl (++) []
+
+myElem :: (Foldable t, Eq a) => a -> t a -> Bool 
+myElem x = foldl check False
+    where check found y = found || x == y
