@@ -78,3 +78,7 @@ removeDuplicates list =
             then helper tail acc -- element is a duplicate so we ignore it
             else helper tail (head:acc) -- element is new so we add it to the accumulator
     in reverse $ helper list []
+    
+-- Aufgabe c
+
+-- Es wurden alle Sprachkonstrukte aus b) (if-else, Wächter, Mustererkennung ohne case, Mustererkennung mit case, anonyme Funktion, where, let, Eigenschaftsliste, filter, Verkettung von Funktionen (Operator “.”), map, $) verwendet. Daher werden hier keine weiteren Funktionen implementiert. 
