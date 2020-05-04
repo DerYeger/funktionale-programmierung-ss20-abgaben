@@ -7,3 +7,8 @@
 
 someFunction :: [Integer]
 someFunction = replicate 2 . product . map (*3) $ zipWith max [1, 2] [4, 5]
+
+-- Aufgabe b
+
+myConcat :: [String] -> String
+myConcat = foldl (++) []
