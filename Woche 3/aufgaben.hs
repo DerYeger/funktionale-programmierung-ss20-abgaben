@@ -10,6 +10,7 @@ someFunction = replicate 2 . product . map (*3) $ zipWith max [1, 2] [4, 5]
 
 -- Aufgabe b
 
+-- myConcat ["abc","def","g"]
 myConcat :: [String] -> String
 myConcat = foldl (++) []
 
@@ -20,14 +21,19 @@ myElem x = foldl check False
 -- Aufgabe c
 
 -- countElem 1 [1, 2, 3, 1, 4, 1, 5, 6, 1, 7]
-
 countElem :: (Foldable t, Eq a) => a -> t a -> Integer
 countElem x = foldr count 0
     where count y acc = acc + if (x == y) then 1 else 0
 
 -- myId [1, 3, 5, 7, 9, 8, 6, 4, 2, 0]
-
 myId :: [a] -> [a]
 myId = foldr (:) []
 
 -- Aufgabe d
+
+-- TODO insertionSort
+
+-- one2two [1,3,2,4,5,6]
+one2two :: [a] -> ([a], [a])
+one2two = foldr split ([], [])
+    where split y (a, b) = (y:b, a)
