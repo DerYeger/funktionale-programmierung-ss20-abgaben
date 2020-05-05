@@ -31,7 +31,13 @@ myId = foldr (:) []
 
 -- Aufgabe d
 
--- TODO insertionSort
+-- insertionSort [6, 1, 8, 2, 5, 2, 3]
+insertionSort :: (Ord a) => [a] -> [a]
+insertionSort = foldl insert []
+    where 
+        insert [] y = [y]
+        insert (x:xs) y = if y <= x then y:x:xs else x : insert xs y
+
 
 -- one2two [1,3,2,4,5,6]
 one2two :: [a] -> ([a], [a])
