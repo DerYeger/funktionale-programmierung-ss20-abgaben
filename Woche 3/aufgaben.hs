@@ -52,9 +52,9 @@ one2two = foldr split ([], [])
 -- Aufgabe e
 
 -- getIndex ['a','k','b']
-getIndex :: [a] -> [(Integer, a)]
-getIndex = reverse . snd . foldl indexify (0, [])
-    where indexify (index, ys) y = (index + 1, (index, y):ys)
+getIndex :: [a] -> [(Int, a)]
+getIndex = reverse . foldl indexify []
+    where indexify ys y = (length ys, y):ys
 
 -- removeTwins [(False, False), (False, True), (True, False), (True, True)]
 removeTwins :: (Eq a) => [(a, a)] -> [(a, a)]
