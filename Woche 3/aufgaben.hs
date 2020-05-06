@@ -46,8 +46,8 @@ insertionSort = foldl insert []
 
 -- one2two [1,3,2,4,5,6]
 one2two :: [a] -> ([a], [a])
-one2two = foldr split ([], [])
-    where split y (a, b) = (y:b, a)
+one2two = foldr dist ([], [])
+    where dist y (a, b) = (y:b, a)
 
 -- Aufgabe e
 
