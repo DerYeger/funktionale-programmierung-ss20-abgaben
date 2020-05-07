@@ -41,8 +41,8 @@ myId = foldr (:) []
 insertionSort :: (Ord a) => [a] -> [a]
 insertionSort = foldl insert []
     where 
-        insert sorted x = let (a, as) = foldr shiftLeft (x, []) sorted in a:as
-        shiftLeft y (z, acc) = if y > z then (z, y:acc) else (y, z:acc)
+        insert sorted x = foldr shiftLeft [x] sorted
+        shiftLeft y (z:zs) = if y > z then z:y:zs else y:z:zs
 
 -- one2two [1,3,2,4,5,6]
 one2two :: [a] -> ([a], [a])
