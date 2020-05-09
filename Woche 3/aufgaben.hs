@@ -65,5 +65,6 @@ removeTwins = foldr remove []
 perms :: Eq a => [a] -> [[a]]
 perms [] = [[]]
 perms xs = [y | x <- xs, y <- map (x:) . perms $ remove x xs]
-    where remove x = reverse . snd . foldl condAdd (False, [])
-            where condAdd (cond, ys) y = if not cond && y == x then (True, ys) else (cond, y:ys)
+    where 
+        remove x = reverse . snd . foldl (condAdd x) (False, [])
+        condAdd x (cond, ys) y = if not cond && y == x then (True, ys) else (cond, y:ys)
