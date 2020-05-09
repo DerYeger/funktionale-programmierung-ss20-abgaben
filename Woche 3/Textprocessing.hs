@@ -1,6 +1,6 @@
 module Textprocessing (histogram) where
 
-import Data.List
+import Data.List (sort)
 
 -- histogram "hallihallo"
 histogram :: String -> [(Char, Int)]
