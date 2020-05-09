@@ -59,6 +59,11 @@ getIndex = reverse . foldl indexify []
 -- removeTwins [(False, False), (False, True), (True, False), (True, True)]
 removeTwins :: (Eq a) => [(a, a)] -> [(a, a)]
 removeTwins = foldr remove []
-    where remove (a, b) acc = if a /= b then (a, b) : acc else acc
+    where remove (a, b) acc = if a /= b then (a, b):acc else acc
 
--- TODO perms
+-- perms [2,3,5]
+perms :: Eq a => [a] -> [[a]]
+perms [] = [[]]
+perms xs = [y | x <- xs, y <- map (x:) . perms $ remove x xs]
+    where remove x = reverse . snd . foldl condAdd (False, [])
+            where condAdd (cond, ys) y = if not cond && y == x then (True, ys) else (cond, y:ys)
