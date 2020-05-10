@@ -53,8 +53,7 @@ one2two = foldr dist ([], [])
 
 -- getIndex ['a','k','b']
 getIndex :: [a] -> [(Int, a)]
-getIndex = reverse . foldl indexify []
-    where indexify ys y = (length ys, y):ys
+getIndex xs = zip [0..] xs
 
 -- removeTwins [(False, False), (False, True), (True, False), (True, True)]
 removeTwins :: (Eq a) => [(a, a)] -> [(a, a)]
