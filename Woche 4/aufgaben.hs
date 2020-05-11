@@ -64,4 +64,16 @@ myUncurry fun (a, b) = fun a b
 
 -- Aufgabe e
 
--- TODO
+-- checkBrackets "{ab[cd]}e{fg[h * i][j{klm}]}"
+-- checkBrackets "{ab[c}]"
+checkBrackets :: String -> Bool
+checkBrackets = fst . foldl check (True, [])
+    where
+        check (matches, stack) c
+            | not matches = (False, [])
+            | isOpeningBracket c = (matches, c:stack)
+            | isClosingBracket c = (c `closes` head stack, tail stack)
+            | otherwise = (matches, stack)
+        isOpeningBracket = flip elem ['[', '{']
+        isClosingBracket = flip elem [']', '}']
+        closes b a = a == '[' && b == ']' || a == '{' && b == '}'
