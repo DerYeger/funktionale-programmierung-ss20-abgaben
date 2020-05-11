@@ -42,15 +42,13 @@ secondDefinition = map (`mod` 2) [0..]
 thirdDefinition :: [Int]
 thirdDefinition = zipWith mod [0..] (repeat 2)
 
--- TODO
 -- take 10 fourthDefinition
--- fourthDefinition :: [Int]
--- fourthDefinition = 
+fourthDefinition :: [Int]
+fourthDefinition = [0, 1] ++ fourthDefinition
 
--- TODO
 -- take 10 fifthDefinition
 -- fifthDefinition :: [Int]
--- fifthDefinition = 
+-- fifthDefinition =
 
 -- Aufgabe d
 
