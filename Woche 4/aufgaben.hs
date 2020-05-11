@@ -6,6 +6,8 @@
 -- Aufgabe a
 
 -- TODO
+-- take 10 powersOfTwo
+-- head $ dropWhile (<= 100) powersOfTwo
 
 -- Aufgabe b
 
