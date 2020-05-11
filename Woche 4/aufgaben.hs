@@ -76,4 +76,4 @@ checkBrackets = fst . foldl check (True, [])
             | otherwise = (matches, stack)
         isOpeningBracket = flip elem ['[', '{']
         isClosingBracket = flip elem [']', '}']
-        closes b a = a == '[' && b == ']' || a == '{' && b == '}'
+        closes r l = l == '[' && r == ']' || l == '{' && r == '}'
