@@ -5,9 +5,10 @@
 
 -- Aufgabe a
 
--- TODO
 -- take 10 powersOfTwo
 -- head $ dropWhile (<= 100) powersOfTwo
+powersOfTwo :: [Int]
+powersOfTwo = 1 : map (2*) powersOfTwo
 
 -- Aufgabe b
 
