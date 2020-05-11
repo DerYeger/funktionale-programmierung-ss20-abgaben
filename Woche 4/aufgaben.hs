@@ -62,8 +62,6 @@ myCurry fun a b = fun (a, b)
 myUncurry :: (a -> b -> c) -> (a, b) -> c
 myUncurry fun (a, b) = fun a b
 
--- TODO
-
 -- Aufgabe e
 
 -- TODO
