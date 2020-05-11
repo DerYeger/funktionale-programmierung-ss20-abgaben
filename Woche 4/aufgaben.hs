@@ -69,11 +69,11 @@ myUncurry fun (a, b) = fun a b
 checkBrackets :: String -> Bool
 checkBrackets = fst . foldl check (True, [])
     where
-        check (matches, stack) c
-            | not matches = (False, [])
-            | isOpeningBracket c = (matches, c:stack)
+        check (valid, stack) c
+            | not valid = (False, [])
+            | isOpeningBracket c = (valid, c:stack)
             | isClosingBracket c = (c `closes` head stack, tail stack)
-            | otherwise = (matches, stack)
+            | otherwise = (valid, stack)
         isOpeningBracket = flip elem ['[', '{']
         isClosingBracket = flip elem [']', '}']
         closes r l = l == '[' && r == ']' || l == '{' && r == '}'
