@@ -72,11 +72,11 @@ checkBrackets :: String -> Bool
 checkBrackets xs = let (valid, stack) = foldl check (True, []) xs in valid && null stack
     where
         check (valid, stack) c
-            | not valid = (False, [])
-            | isOpenBracket c = (valid, c:stack)
-            | isClosedBracket c && null stack = (False, [])
-            | isClosedBracket c = (c `closes` head stack, tail stack)
-            | otherwise = (valid, stack)
+            | not valid = (False, []) -- brackets did not match previously -> fail
+            | isOpenBracket c = (valid, c:stack) -- c is open bracket and added to the stack
+            | isClosedBracket c && null stack = (False, []) -- c is closed bracket but no open bracket is on the stack -> fail
+            | isClosedBracket c = (c `closes` head stack, tail stack) -- c is closed bracket and checked against last open bracket
+            | otherwise = (valid, stack) -- continue with next char
         isOpenBracket = flip elem ['[', '{']
         isClosedBracket = flip elem [']', '}']
         closes r l = l == '[' && r == ']' || l == '{' && r == '}'
