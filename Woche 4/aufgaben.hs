@@ -11,6 +11,7 @@ powersOfTwo :: [Int]
 powersOfTwo = 1 : map (2*) powersOfTwo
 
 -- Aufgabe b
+-- take 5 $ zip c d
 
 -- take 10 a
 a :: [Int]
@@ -27,8 +28,6 @@ c = 2 : 3 : map (\i -> d!!(i - 1) - c!!(i - 2)) [2..]
 -- take 10 d
 d :: [Int]
 d = 1 : map (\i -> d!!(i - 1) * c!!i + 1) [1..]
-
--- take 5 $ zip c d
 
 -- Aufgabe c
 
