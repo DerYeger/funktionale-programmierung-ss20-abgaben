@@ -74,6 +74,7 @@ checkBrackets xs = let (valid, stack) = foldl check (True, []) xs in valid && nu
         check (valid, stack) c
             | not valid = (False, [])
             | isOpenBracket c = (valid, c:stack)
+            | isClosedBracket c && null stack = (False, [])
             | isClosedBracket c = (c `closes` head stack, tail stack)
             | otherwise = (valid, stack)
         isOpenBracket = flip elem ['[', '{']
