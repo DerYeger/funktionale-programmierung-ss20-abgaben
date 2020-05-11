@@ -64,6 +64,8 @@ myUncurry fun (a, b) = fun a b
 
 -- Aufgabe e
 
+-- checkBrackets "{[]{}[{}]}"
+-- checkBrackets "{[]{}[{[}]]}"
 -- checkBrackets "{ab[cd]}e{fg[h * i][j{klm}]}"
 -- checkBrackets "{ab[c}]"
 checkBrackets :: String -> Bool
