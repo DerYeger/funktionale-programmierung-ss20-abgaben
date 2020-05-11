@@ -54,6 +54,14 @@ fourthDefinition = [0, 1] ++ fourthDefinition
 
 -- Aufgabe d
 
+-- myCurry fst "Correct" "Wrong"
+myCurry :: ((a, b) -> c) -> a -> b -> c
+myCurry fun a b = fun (a, b)
+
+-- myUncurry (+) (3, 4)
+myUncurry :: (a -> b -> c) -> (a, b) -> c
+myUncurry fun (a, b) = fun a b
+
 -- TODO
 
 -- Aufgabe e
