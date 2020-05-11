@@ -69,7 +69,7 @@ myUncurry fun (a, b) = fun a b
 -- checkBrackets "{ab[cd]}e{fg[h * i][j{klm}]}"
 -- checkBrackets "{ab[c}]"
 checkBrackets :: String -> Bool
-checkBrackets = fst . foldl check (True, [])
+checkBrackets xs = let (valid, stack) = foldl check (True, []) xs in valid && null stack
     where
         check (valid, stack) c
             | not valid = (False, [])
