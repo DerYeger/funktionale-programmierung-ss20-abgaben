@@ -7,26 +7,26 @@
 
 -- take 10 powersOfTwo
 -- head $ dropWhile (<= 100) powersOfTwo
-powersOfTwo :: [Int]
+powersOfTwo :: [Integer]
 powersOfTwo = iterate (2*) 1
 
 -- Aufgabe b
 -- take 5 $ zip c d
 
 -- take 10 a
-a :: [Int]
+a :: [Integer]
 a = 2 : map (\n -> 3 * a!!(n - 1) + 4) [1..]
 
 -- take 10 b
-b :: [Int]
+b :: [Integer]
 b = 5 : 2 : 4 : map (\n -> 2 * b!!(n - 3) - 3 * b!!(n - 1) + 4) [3..]
 
 -- take 10 c
-c :: [Int]
+c :: [Integer]
 c = 2 : 3 : map (\i -> d!!(i - 1) - c!!(i - 2)) [2..]
 
 -- take 10 d
-d :: [Int]
+d :: [Integer]
 d = 1 : map (\i -> d!!(i - 1) * c!!i + 1) [1..]
 
 -- Aufgabe c
