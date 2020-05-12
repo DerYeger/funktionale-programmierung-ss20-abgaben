@@ -8,14 +8,14 @@
 -- take 10 powersOfTwo
 -- head $ dropWhile (<= 100) powersOfTwo
 powersOfTwo :: [Integer]
-powersOfTwo = iterate (2*) 1
+powersOfTwo = 1 : map (*2) powersOfTwo
 
 -- Aufgabe b
 -- take 5 $ zip c d
 
 -- take 10 a
 a :: [Integer]
-a = 2 : map (\n -> 3 * a!!(n - 1) + 4) [1..]
+a = 2: map (\y -> y * 3 + 4) a
 
 -- take 10 b
 b :: [Integer]
