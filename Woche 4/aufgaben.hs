@@ -8,7 +8,7 @@
 -- take 10 powersOfTwo
 -- head $ dropWhile (<= 100) powersOfTwo
 powersOfTwo :: [Int]
-powersOfTwo = 1 : map (2*) powersOfTwo
+powersOfTwo = iterate (2*) 1
 
 -- Aufgabe b
 -- take 5 $ zip c d
@@ -39,18 +39,17 @@ firstDefinition = 0 : 1 : firstDefinition
 secondDefinition :: [Int]
 secondDefinition = map (`mod` 2) [0..]
 
--- TODO Ähnelt zu sehr secondDefinition?
 -- take 10 thirdDefinition
 thirdDefinition :: [Int]
-thirdDefinition = zipWith mod [0..] (repeat 2)
+thirdDefinition = iterate (\x -> (x + 1) `mod` 2) 0
 
 -- take 10 fourthDefinition
 fourthDefinition :: [Int]
 fourthDefinition = [0, 1] ++ fourthDefinition
 
 -- take 10 fifthDefinition
--- fifthDefinition :: [Int]
--- fifthDefinition =
+fifthDefinition :: [Int]
+fifthDefinition = cycle [0, 1]
 
 -- Aufgabe d
 
