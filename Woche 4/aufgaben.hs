@@ -15,7 +15,7 @@ powersOfTwo = iterate (2*) 1
 
 -- take 10 a
 a :: [Integer]
-a = iterate(\x -> 3 * x + 4) 2
+a = iterate (\x -> 3 * x + 4) 2
 
 -- take 10 b
 b :: [Integer]
