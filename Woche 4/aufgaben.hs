@@ -15,7 +15,7 @@ powersOfTwo = iterate (2*) 1
 
 -- take 10 a
 a :: [Integer]
-a = 2 : map (\n -> 3 * a!!(n - 1) + 4) [1..]
+a = iterate(\x -> 3 * x + 4) 2
 
 -- take 10 b
 b :: [Integer]
