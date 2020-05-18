@@ -42,11 +42,11 @@ data Time = ExactTime {hour :: Int, minute :: Int}
             |
             SimpleTime {offset :: String, hour :: Int}
 
--- ExactTime 20 45 :: Time
--- ExactTime 11 30 :: Time
--- ExactTime 14 00
--- SimpleTime "halb" 12 :: Time
--- SimpleTime "um" 7
+-- let t1 = ExactTime 20 45 :: Time
+-- let t2 = ExactTime 11 30 :: Time
+-- let t3 = ExactTime 14 00
+-- let t4 = SimpleTime "halb" 12 :: Time
+-- let t5 = SimpleTime "um" 7
 instance Show Time where 
     show (ExactTime hour minute)
         | minute == 0 = show $ SimpleTime "um" hour
@@ -57,6 +57,19 @@ instance Show Time where
         where formatHour x = show $ if x == 12 then x else x `mod` 12
 
 -- Aufgabe f
+
+class HasDistance a where
+    dist :: a -> a -> Double
+
+-- dist t2 t3
+-- dist t3 t2
+-- dist t2 t4
+-- dist t1 t5
+instance HasDistance Time where
+    dist fst snd = fromIntegral . abs $ getAbs fst - getAbs snd
+        where 
+            getAbs (ExactTime h m) = h * 60 + m
+            getAbs (SimpleTime offset h) = h * 60 - if offset == "halb" then 30 else 0
 
 -- Aufgabe g
 
