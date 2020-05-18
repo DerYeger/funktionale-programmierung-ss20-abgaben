@@ -115,19 +115,16 @@ move (Cell y x) direction = case direction of
 
 -- nPerfect 3
 nPerfect :: Int -> [Int]
-nPerfect = flip take (filter isPerfect [2..])
-    where isPerfect x = x == (sum . divs $ x)        
+nPerfect = flip take (filter isPerfect [2..])   
 
-divs :: Int -> [Int]
-divs x = 1 : if upper == lower then tail divisors else divisors
+isPerfect :: Int -> Bool
+isPerfect x = x == 1 + if ceiling root == lower then summed - lower else summed -- if sqrt x is whole number we added one to much
     where 
         root = sqrt . fromIntegral $ x
-        upper = ceiling root
         lower = floor root
-        possibleDivs x = [(x `mod` 2) + 2 .. lower]
-        check x ys y
-            | x `mod` y /= 0 = ys
-            | other == y = y : ys
-            | otherwise = other : y : ys    
-                where other = x `div` y
-        divisors = foldl' (check x) [] (possibleDivs x)
+        possibleDivs x = [(x `mod` 2) + 2 .. lower] -- possible divisors
+        sumDivs acc y
+            | acc >= x || acc == -1 = -1 -- cancel
+            | x `mod` y /= 0 = acc -- continue
+            | otherwise = acc + y + x `div` y -- add divisors (will add root twice, if it is an integer)
+        summed = foldl' sumDivs 0 (possibleDivs x)
