@@ -112,3 +112,11 @@ move (Cell y x) direction = case direction of
             | otherwise = x
 
 -- Aufgabe i
+
+-- nPerfect 3
+nPerfect :: Int -> [Int]
+nPerfect = flip take perfectNumbers
+    
+perfectNumbers :: [Int]
+perfectNumbers = filter isPerfect [1..]
+    where isPerfect x = x == sum [y | y <- [1 .. x `div` 2], x `mod` y == 0 ]
