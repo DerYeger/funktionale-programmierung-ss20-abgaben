@@ -2,6 +2,7 @@
 
 module FP05 where
 
+import Prelude hiding (Left, Up, Right, Down)
 import Data.List(foldl')
 
 -- Juri Lozowoj, 35244015
@@ -86,5 +87,28 @@ getSimple (ExactTime h m)
     | otherwise = Nothing
 
 -- Aufgabe h
+
+data Cell = Cell {y :: Int, x :: Int}
+
+data Direction = Left | Up | Right | Down
+
+instance Show Cell where 
+    show (Cell y x) = "(" ++ show y ++ "," ++ show x ++ ")"
+
+-- move (Cell 4 5) Left
+-- move (Cell 5 0) Left
+-- move (Cell 9 3) Down
+move :: Cell -> Direction -> Cell
+move (Cell y x) direction = case direction of 
+    Left -> Cell y (limited $ x - 1)
+    Up -> Cell (limited $ y - 1) x 
+    Right -> Cell y (limited $ x + 1)
+    Down -> Cell (limited $ y + 1) x
+    where 
+        n = 10
+        limited x
+            | x <= 0 = 0
+            | n <= x = n - 1
+            | otherwise = x
 
 -- Aufgabe i
