@@ -88,7 +88,7 @@ getSimple (ExactTime h m)
 
 -- Aufgabe h
 
-data Cell = Cell {y :: Int, x :: Int}
+data Cell = Cell {yVal :: Int, xVal :: Int}
 
 data Direction = Left | Up | Right | Down
 
@@ -115,8 +115,19 @@ move (Cell y x) direction = case direction of
 
 -- nPerfect 3
 nPerfect :: Int -> [Int]
-nPerfect = flip take perfectNumbers
-    
-perfectNumbers :: [Int]
-perfectNumbers = filter isPerfect [1..]
-    where isPerfect x = x == sum [y | y <- [1 .. x `div` 2], x `mod` y == 0 ]
+nPerfect = flip take (filter isPerfect [2..])
+    where isPerfect x = x == (sum . divs $ x)        
+
+divs :: Int -> [Int]
+divs x = 1 : if upper == lower then tail divisors else divisors
+    where 
+        root = sqrt . fromIntegral $ x
+        upper = ceiling root
+        lower = floor root
+        possibleDivs x = [(x `mod` 2) + 2 .. lower]
+        check x ys y
+            | x `mod` y /= 0 = ys
+            | other == y = y : ys
+            | otherwise = other : y : ys    
+                where other = x `div` y
+        divisors = foldl' (check x) [] (possibleDivs x)
