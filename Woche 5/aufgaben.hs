@@ -38,6 +38,24 @@ someBook = Book "Doberkat" "Haskell"
 
 -- Aufgabe e
 
+data Time = ExactTime {hour :: Int, minute :: Int}
+            |
+            SimpleTime {offset :: String, hour :: Int}
+
+-- ExactTime 20 45 :: Time
+-- ExactTime 11 30 :: Time
+-- ExactTime 14 00
+-- SimpleTime "halb" 12 :: Time
+-- SimpleTime "um" 7
+instance Show Time where 
+    show (ExactTime hour minute)
+        | minute == 0 = show $ SimpleTime "um" hour
+        | minute == 30 = show $ SimpleTime "halb" (hour + 1)
+        | otherwise = show hour ++ ":" ++ formatMinute minute
+            where formatMinute x = (if x <= 9 then "0" else "") ++ show x
+    show (SimpleTime offset hour) = offset ++ " " ++ formatHour hour
+        where formatHour x = show $ if x == 12 then x else x `mod` 12
+
 -- Aufgabe f
 
 -- Aufgabe g
