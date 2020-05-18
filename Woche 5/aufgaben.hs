@@ -73,6 +73,18 @@ instance HasDistance Time where
 
 -- Aufgabe g
 
+-- getSimple t1
+-- getSimple t2
+-- getSimple t3
+-- getSimple t4
+-- getSimple t5
+getSimple :: Time -> Maybe Time
+getSimple it@(SimpleTime _ _) = Just it
+getSimple (ExactTime h m)
+    | m == 0 = Just $ SimpleTime "um" h
+    | m == 30 = Just $ SimpleTime "halb" (h + 1)
+    | otherwise = Nothing
+
 -- Aufgabe h
 
 -- Aufgabe i
