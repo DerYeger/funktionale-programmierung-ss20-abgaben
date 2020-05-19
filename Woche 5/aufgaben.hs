@@ -120,25 +120,11 @@ move2 (y, x) = move $ Cell y x
 -- Aufgabe i
 
 -- nPerfect 3
-nPerfect :: Int -> [Int]
-nPerfect = flip take (filter isPerfect [0..])   
+getDividers :: Integer -> [Integer]
+getDividers n = [x | x <- [1.. (n - 1)], n `rem` x == 0]
 
-isPerfect :: Int -> Bool
-isPerfect x = ds + o == 1
-    where 
-        r = sqrt . fromIntegral $ x
-        l = floor r
-        subDivs y s
-            | s < 1 = 0 -- cancel
-            | x `mod` y /= 0 = s -- continue
-            | otherwise = s - y - x `div` y -- subtract divisors
-        ds = foldr subDivs x [2..l] -- == x - divisors(x) + 1
-        o = if ceiling r == l then l else 0 -- if sqrt x is whole number we subtracted one to much
+sumOfFactors:: Integer -> Integer
+sumOfFactors n = sum $ getDividers n
 
--- Simplere und langsamere Variante
--- nPerfect :: Int -> [Int]
--- nPerfect = flip take perfectNumbers
-
--- perfectNumbers :: [Int]
--- perfectNumbers = filter isPerfect [1..]
---     where isPerfect x = x == sum [y | y <- [1 .. x `div` 2], x `mod` y == 0 ] 
+nPerfects :: Int -> [Integer]
+nPerfects n = take n [x | x <- [1..], sumOfFactors x == x]
