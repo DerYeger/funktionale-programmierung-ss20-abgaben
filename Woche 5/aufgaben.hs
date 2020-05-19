@@ -3,7 +3,7 @@
 module FP05 where
 
 import Prelude hiding (Left, Up, Right, Down)
-import Data.List(foldl')
+import Data.List (foldl')
 
 -- Juri Lozowoj, 35244015
 -- Jan Müller, 35011918
@@ -41,7 +41,7 @@ someBook = Book "Doberkat" "Haskell"
 
 data Time = ExactTime {hour :: Int, minute :: Int}
             |
-            SimpleTime {offset :: String, hour :: Int}
+            SimpleTime {word :: String, hour :: Int}
 
 -- let t1 = ExactTime 20 45 :: Time
 -- let t2 = ExactTime 11 30 :: Time
@@ -49,13 +49,13 @@ data Time = ExactTime {hour :: Int, minute :: Int}
 -- let t4 = SimpleTime "halb" 12 :: Time
 -- let t5 = SimpleTime "um" 7
 instance Show Time where 
-    show (ExactTime hour minute)
-        | minute == 0 = show $ SimpleTime "um" hour
-        | minute == 30 = show $ SimpleTime "halb" (hour + 1)
-        | otherwise = show hour ++ ":" ++ formatMinute minute
-            where formatMinute x = (if x <= 9 then "0" else "") ++ show x
-    show (SimpleTime offset hour) = offset ++ " " ++ formatHour hour
-        where formatHour x = show $ if x == 12 then x else x `mod` 12
+    show (ExactTime h m)
+        | m == 0 = show $ SimpleTime "um" h
+        | m == 30 = show $ SimpleTime "halb" (h + 1)
+        | otherwise = show h ++ ":" ++ formatMinute
+            where formatMinute = (if m <= 9 then "0" else "") ++ show m
+    show (SimpleTime w h) = w ++ " " ++ formatHour
+        where formatHour = show $ if h == 12 then h else h `mod` 12
 
 -- Aufgabe f
 
@@ -70,7 +70,7 @@ instance HasDistance Time where
     dist fst snd = fromIntegral . abs $ getAbs fst - getAbs snd
         where 
             getAbs (ExactTime h m) = h * 60 + m
-            getAbs (SimpleTime offset h) = h * 60 - if offset == "halb" then 30 else 0
+            getAbs (SimpleTime w h) = h * 60 - if w == "halb" then 30 else 0
 
 -- Aufgabe g
 
@@ -100,16 +100,22 @@ instance Show Cell where
 -- move (Cell 9 3) Down
 move :: Cell -> Direction -> Cell
 move (Cell y x) direction = case direction of 
-    Left -> Cell y (limited $ x - 1)
-    Up -> Cell (limited $ y - 1) x 
-    Right -> Cell y (limited $ x + 1)
-    Down -> Cell (limited $ y + 1) x
+    Left -> Cell y (lim $ x - 1)
+    Up -> Cell (lim $ y - 1) x 
+    Right -> Cell y (lim $ x + 1)
+    Down -> Cell (lim $ y + 1) x
     where 
         n = 10
-        limited x
+        lim x
             | x <= 0 = 0
             | n <= x = n - 1
             | otherwise = x
+
+-- move2 (4,5) Left
+-- move2 (5,0) Left
+-- move2 (9,3) Down
+move2 :: (Int, Int) -> Direction -> Cell
+move2 (y, x) = move $ Cell y x
 
 -- Aufgabe i
 
@@ -118,13 +124,21 @@ nPerfect :: Int -> [Int]
 nPerfect = flip take (filter isPerfect [0..])   
 
 isPerfect :: Int -> Bool
-isPerfect x = diff + offset == 1
+isPerfect x = ds + o == 1
     where 
-        root = sqrt . fromIntegral $ x
-        lower = floor root
-        subDivs y acc
-            | acc < 1 = 0 -- cancel
-            | x `mod` y /= 0 = acc -- continue
-            | otherwise = acc - y - x `div` y -- subtract divisors
-        diff = foldr subDivs x [2 .. lower] -- == x - divisors(x) + 1
-        offset = if ceiling root == lower then lower else 0 -- if sqrt x is whole number we subtracted one to much
+        r = sqrt . fromIntegral $ x
+        l = floor r
+        subDivs y s
+            | s < 1 = 0 -- cancel
+            | x `mod` y /= 0 = s -- continue
+            | otherwise = s - y - x `div` y -- subtract divisors
+        ds = foldr subDivs x [2..l] -- == x - divisors(x) + 1
+        o = if ceiling r == l then l else 0 -- if sqrt x is whole number we subtracted one to much
+
+-- Simplere und langsamere Variante
+-- nPerfect :: Int -> [Int]
+-- nPerfect = flip take perfectNumbers
+
+-- perfectNumbers :: [Int]
+-- perfectNumbers = filter isPerfect [1..]
+--     where isPerfect x = x == sum [y | y <- [1 .. x `div` 2], x `mod` y == 0 ] 
