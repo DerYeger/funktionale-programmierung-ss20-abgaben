@@ -135,10 +135,22 @@ isPerfect x = ds + o == 1
         ds = foldr subDivs x [2..l] -- == x - divisors(x) + 1
         o = if ceiling r == l then l else 0 -- if sqrt x is whole number we subtracted one to much
 
--- Simplere und langsamere Variante
+-- Simplere und langsamere Varianten
+
+-- Variante 1
 -- nPerfect :: Int -> [Int]
 -- nPerfect = flip take perfectNumbers
 
 -- perfectNumbers :: [Int]
 -- perfectNumbers = filter isPerfect [1..]
 --     where isPerfect x = x == sum [y | y <- [1 .. x `div` 2], x `mod` y == 0 ] 
+
+-- Variante 2
+-- getDividers :: Integer -> [Integer]
+-- getDividers n = [x | x <- [1.. (n - 1)], n `rem` x == 0]
+
+-- sumOfFactors:: Integer -> Integer
+-- sumOfFactors n = sum $ getDividers n
+
+-- nPerfects :: Int -> [Integer]
+-- nPerfects n = take n [x | x <- [1..], sumOfFactors x == x]
