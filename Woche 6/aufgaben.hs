@@ -80,4 +80,16 @@ instance Eq (Tree a) where
 instance Ord (Tree a) where
     fst `compare` snd = countNodes fst `compare` countNodes snd
 
+-- ti1 = insert (2, "zwei") Empty
+-- ti2 = insert (1, "eins") ti1
+-- ti3 = insert (4, "vier") ti2
+-- ti4 = insert (3, "drei") ti3
+-- ti5 = insert (4, "nochEineVier") ti4
+insert :: (Ord a) => (a, b) -> Tree (a, b) -> Tree (a, b)
+insert n Empty = Node Empty n Empty
+insert n@(nk, _) (Node l m@(mk, _) r)
+    | nk < mk = Node l m (insert n r)
+    | nk == mk = Node l m r
+    | otherwise = Node (insert n l) m r
+
 -- Aufgabe d
