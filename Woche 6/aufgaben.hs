@@ -80,11 +80,12 @@ instance Eq (Tree a) where
 instance Ord (Tree a) where
     fst `compare` snd = countNodes fst `compare` countNodes snd
 
--- ti1 = insert (2, "zwei") Empty
--- ti2 = insert (1, "eins") ti1
--- ti3 = insert (4, "vier") ti2
--- ti4 = insert (3, "drei") ti3
--- ti5 = insert (4, "nochEineVier") ti4
+ti1 = insert (2, "zwei") Empty
+ti2 = insert (1, "eins") ti1
+ti3 = insert (4, "vier") ti2
+ti4 = insert (3, "drei") ti3
+ti5 = insert (4, "nochEineVier") ti4
+
 insert :: (Ord a) => (a, b) -> Tree (a, b) -> Tree (a, b)
 insert n Empty = Node Empty n Empty
 insert n@(nk, _) (Node l m@(mk, _) r)
@@ -93,3 +94,21 @@ insert n@(nk, _) (Node l m@(mk, _) r)
     | otherwise = Node (insert n l) m r
 
 -- Aufgabe d
+
+data GeneralTree a = GNode a [GeneralTree a]
+
+tg1 = GNode 1 []
+tg2 = GNode 2 [tg4]
+tg3 = GNode 3 []
+tg4 = GNode 4 []
+tg5 = GNode 5 [tg3]
+tg6 = GNode 6 [tg5,tg1,tg2]
+tg7 = GNode 7 [tg6]
+
+instance (Show a) => Show (GeneralTree a) where
+    show = unwords . levelorder . pure
+        where 
+            levelorder [] = []
+            levelorder xs = map showValue xs ++ levelorder (concatMap childs xs)
+            showValue (GNode x _) = show x
+            childs (GNode _ xs) = xs
