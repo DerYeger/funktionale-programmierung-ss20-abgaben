@@ -23,6 +23,11 @@ popd (Keller _) = Keller ([], Nothing)
 
 -- Aufgabe b
 
+-- Beim zweiten Beispiel wird auf Ungleicheit geprüft.
+-- Dabei handelt es sich um die Negation der Gleichheit, welche durch Zugehörigkeit der Klasse Eq definiert wurde.
+-- Dementsprechend ist es nicht notwendig die Negation einzeln zu definieren.
+-- Sie wird aus der existierenden Definition abgeleitet.
+
 -- Aufgabe c
 
 -- Aufgabe d
