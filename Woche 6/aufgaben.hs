@@ -56,4 +56,11 @@ computeSum :: (Num a) => Tree a -> a
 computeSum Empty = 0
 computeSum (Node l m r) = computeSum l + m + computeSum r
 
+-- fmap (*2) simpleTree
+-- fmap (*2) exampleTree
+-- fmap (*2) Empty
+instance Functor Tree where
+    fmap f Empty = Empty
+    fmap f (Node l m r) = Node (fmap f l) (f m) (fmap f r)
+
 -- Aufgabe d
