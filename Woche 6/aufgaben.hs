@@ -35,6 +35,9 @@ data Tree a = Empty | Node (Tree a) a (Tree a)
 simpleTree = Node (Node Empty 1 Empty) 2 (Node Empty 3 Empty)
 exampleTree = Node (Node Empty 11 Empty) 10 (Node (Node Empty 9 Empty) 7 (Node Empty 5 Empty))
 
+-- getRoot simpleTree 
+-- getRoot exampleTree
+-- getRoot Empty
 getRoot :: Tree a -> Maybe a
 getRoot (Node _ m _) = Just m
 getRoot _ = Nothing
@@ -45,5 +48,12 @@ instance (Show a) => Show (Tree a) where
             showInset i Empty = replicate i ' ' ++ "Empty"
             showInset i (Node l m r) = nextIns r ++ "\n" ++ replicate i ' ' ++ show m ++ "\n" ++ nextIns l
                 where nextIns = showInset (i + 5)
+
+-- computeSum simpleTree 
+-- computeSum exampleTree
+-- computeSum Empty
+computeSum :: (Num a) => Tree a -> a
+computeSum Empty = 0
+computeSum (Node l m r) = computeSum l + m + computeSum r
 
 -- Aufgabe d
