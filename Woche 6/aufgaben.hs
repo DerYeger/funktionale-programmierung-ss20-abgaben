@@ -3,6 +3,10 @@
 -- Juri Lozowoj, 35244015
 -- Jan Müller, 35011918
 
+module FP06 where
+
+import Data.List (sort)
+
 -- Aufgabe a
 
 newtype Keller a = Keller {derKeller :: ([a], Maybe a)}
@@ -43,7 +47,7 @@ getRoot (Node _ m _) = Just m
 getRoot _ = Nothing
 
 instance (Show a) => Show (Tree a) where
-    show = showInset 0
+    show t =  "\n" ++ showInset 0 t ++ "\n"
         where 
             showInset i Empty = replicate i ' ' ++ "Empty"
             showInset i (Node l m r) = nextIns r ++ "\n" ++ replicate i ' ' ++ show m ++ "\n" ++ nextIns l
@@ -62,5 +66,21 @@ computeSum (Node l m r) = computeSum l + m + computeSum r
 instance Functor Tree where
     fmap f Empty = Empty
     fmap f (Node l m r) = Node (fmap f l) (f m) (fmap f r)
+
+    
+instance Eq (Tree a) where
+    fst == snd = countNodes fst == countNodes snd
+        where
+            countNodes (Node l m r) = 1 + countNodes l + countNodes r
+            countNodes Empty = 0
+
+-- compare Empty (Node Empty 3 Empty)
+-- (Node Empty 3 Empty) == (Node Empty 5 Empty)
+-- sort [exampleTree, simpleTree, Empty]
+instance Ord (Tree a) where
+    fst `compare` snd = countNodes fst `compare` countNodes snd
+        where
+            countNodes (Node l m r) = 1 + countNodes l + countNodes r
+            countNodes Empty = 0
 
 -- Aufgabe d
