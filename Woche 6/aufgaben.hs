@@ -67,20 +67,17 @@ instance Functor Tree where
     fmap f Empty = Empty
     fmap f (Node l m r) = Node (fmap f l) (f m) (fmap f r)
 
-    
+countNodes :: Tree a -> Int
+countNodes (Node l m r) = 1 + countNodes l + countNodes r
+countNodes Empty = 0
+
 instance Eq (Tree a) where
-    fst == snd = countNodes fst == countNodes snd
-        where
-            countNodes (Node l m r) = 1 + countNodes l + countNodes r
-            countNodes Empty = 0
+    fst == snd = countNodes fst == countNodes snd         
 
 -- compare Empty (Node Empty 3 Empty)
 -- (Node Empty 3 Empty) == (Node Empty 5 Empty)
 -- sort [exampleTree, simpleTree, Empty]
 instance Ord (Tree a) where
     fst `compare` snd = countNodes fst `compare` countNodes snd
-        where
-            countNodes (Node l m r) = 1 + countNodes l + countNodes r
-            countNodes Empty = 0
 
 -- Aufgabe d
