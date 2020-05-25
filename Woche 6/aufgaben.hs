@@ -30,4 +30,16 @@ popd (Keller _) = Keller ([], Nothing)
 
 -- Aufgabe c
 
+data Tree a = Empty | Node (Tree a) a (Tree a)
+
+simpleTree = Node (Node Empty 1 Empty) 2 (Node Empty 3 Empty)
+exampleTree = Node (Node Empty 11 Empty) 10 (Node (Node Empty 9 Empty) 7 (Node Empty 5 Empty))
+
+instance (Show a) => Show (Tree a) where
+    show = showInset 0
+        where 
+            showInset i Empty = replicate i ' ' ++ "Empty"
+            showInset i (Node l m r) = nextIns r ++ "\n" ++ replicate i ' ' ++ show m ++ "\n" ++ nextIns l
+                where nextIns = showInset (i + 5)
+
 -- Aufgabe d
