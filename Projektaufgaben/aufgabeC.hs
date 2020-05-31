@@ -3,7 +3,7 @@ module AufgabeC where
 import System.Random (randomRIO)
 
 data Strategy = Bad | Nice
-    deriving (Eq)
+    deriving (Eq, Show)
 
 fieldSize :: Int
 fieldSize = 24
@@ -30,9 +30,9 @@ start = InProgress (Player "A" 1 fieldSize) (Player "B" 8 fieldSize)
 
 nextPos _ s@(GameOver _) _ = s
 nextPos strategy (InProgress cp@(Player _ cl _) op@(Player _ ol _)) d
-    | nl /= ol = InProgress op (move cp nl)
-    | strategy == Bad = GameOver cp
-    | otherwise = InProgress op (move cp (onField nl - 1))
+    | nl /= ol = InProgress op (move cp nl) -- just move
+    | strategy == Bad = GameOver cp -- TODO Does this actually cause a loss?
+    | otherwise = InProgress op (move cp (onField nl - 1)) -- apply nice strategy
         where 
             nl = onField (cl + d)
 
@@ -41,18 +41,6 @@ checkWinner s@(GameOver _) = s
 checkWinner s@(InProgress _ p)
     | remaining p > 0 = s
     | otherwise = GameOver p
-
-turn :: IO State -> IO State
-turn sio = do
-    d <- rollDice
-    os <- sio
-    let cpName = name . currentPlayer $ os
-    putStr $ cpName ++ " rolled " ++ show d ++ "\n"
-    let ns = checkWinner $ nextPos Nice os d
-    putStr $ show ns ++ "\n"
-    return ns
-
-firstTurn = turn . pure $ start
 
 rollDice :: IO Int
 rollDice = randomRIO (1, 6)
@@ -63,9 +51,35 @@ onField x
     | x == 0 = 1
     | otherwise = x
 
+automatedTurn :: Strategy -> IO State -> IO State
+automatedTurn strat sio = do
+    d <- rollDice
+    os <- sio
+    let cpName = name . currentPlayer $ os
+    -- putStr $ cpName ++ " rolled " ++ show d ++ " and uses the " ++ show strat ++ " strategy.\n"
+    let ns = checkWinner $ nextPos strat os d
+    -- putStr $ show ns ++ "\n"
+    case ns of 
+        (GameOver _) -> pure ns
+        (InProgress _ _) -> automatedTurn (nextStrat strat) (pure ns)
 
--- ludoInteractive :: IO()
--- ludoInteractive = do
- 
+automatedRounds :: Int -> IO (Int, Int)
+automatedRounds rc =
+    if rc <= 0 
+        then return(0,0) 
+        else do
+            (aw, bw) <- automatedRounds $ rc - 1
+            r <- automatedTurn Bad (pure start)
+            let w =  winner r
+            let new = if name w == "A" then (aw + 1, bw) else (aw, bw + 1)
+            pure new
 
--- nextPos Nice (InProgress (Player "A" 23 2) (Player "B" 24 8)) 1
+ludoStatistic :: Int -> IO ()
+ludoStatistic rc = do
+    (aw, bw) <- automatedRounds rc
+    putStr $ "A has won " ++ show aw ++ " round(s) using the " ++ show Bad ++ " strategy.\n"
+        ++ "B has won " ++ show bw ++ " round(s) using the " ++ show Nice ++ " strategy.\n"
+
+nextStrat :: Strategy -> Strategy
+nextStrat Bad = Nice
+nextStrat Nice = Bad
