@@ -12,7 +12,7 @@ type Pos = (Int, Player)
 type State = (Pos, Pos)
 
 start :: State
-start = ((0, A), (7, B))
+start = ((1, A), (8, B))
 
 nextPos strategy ((al, ap), (pl , pp)) d
     | trgt /= pl = ((pl, pp), (trgt, ap))
@@ -24,8 +24,11 @@ nextPos strategy ((al, ap), (pl , pp)) d
 turn :: IO State -> IO State
 turn state = do
     d <- rollDice
-    s <- state
-    pure $ nextPos Nice s d
+    os <- state
+    putStr $ show (snd . fst $ os) ++ " rolled " ++ show d ++ "\n"
+    let ns = nextPos Nice os d
+    putStr $ show ns ++ "\n\n"
+    pure ns
 
 firstTurn = turn . pure $ start
 
