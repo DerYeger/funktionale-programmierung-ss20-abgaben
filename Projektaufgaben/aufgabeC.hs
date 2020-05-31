@@ -5,27 +5,42 @@ import System.Random (randomRIO)
 data Strategy = Bad | Nice
     deriving (Eq)
 
-data Player = Player {name::String, location::Int, target::Int}
-instance Show Player where
-    show (Player n l t) = n ++ " (" ++ show l ++ ", " ++ show t ++ ")"
+fieldSize :: Int
+fieldSize = 24
 
-setLocation :: Player -> Int -> Player
-setLocation (Player n l t) nl = Player n nl t
+data Player = Player {name::String, location::Int, remaining::Int}
+instance Show Player where
+    show (Player n l r) = n ++ " is on " ++ show l ++ " and has " ++ show r ++ " steps left."
+
+move :: Player -> Int -> Player
+move (Player n l r) nl = Player n nl (r - rd)
+    where 
+        rd
+            | l == nl = 0 -- didnt move
+            | nl > l = nl - l -- move didnt pass 24
+            | otherwise = fieldSize - l + nl -- move passed 24
 
 data State = InProgress {currentPlayer::Player, otherPlayer::Player} | GameOver {winner::Player}
 instance Show State where
     show (InProgress cp op) = "Current Player: " ++ show cp ++ "\nWaiting Player: " ++ show op ++ "\n"
+    show (GameOver w) = show (name w) ++ " has won the game.\n"
 
 start :: State
-start = InProgress (Player "A" 1 1) (Player "B" 8 8)
+start = InProgress (Player "A" 1 fieldSize) (Player "B" 8 fieldSize)
 
 nextPos _ s@(GameOver _) _ = s
-nextPos strategy (InProgress cp@(Player _ cl ct) op@(Player _ ol ot)) d
-    | ct /= ol = InProgress op (setLocation cp nl)
+nextPos strategy (InProgress cp@(Player _ cl _) op@(Player _ ol _)) d
+    | nl /= ol = InProgress op (move cp nl)
     | strategy == Bad = GameOver cp
-    | otherwise = InProgress op (setLocation cp (onField nl - 1))
+    | otherwise = InProgress op (move cp (onField nl - 1))
         where 
             nl = onField (cl + d)
+
+checkWinner :: State -> State
+checkWinner s@(GameOver _) = s
+checkWinner s@(InProgress _ p)
+    | remaining p > 0 = s
+    | otherwise = GameOver p
 
 turn :: IO State -> IO State
 turn sio = do
@@ -33,7 +48,7 @@ turn sio = do
     os <- sio
     let cpName = name . currentPlayer $ os
     putStr $ cpName ++ " rolled " ++ show d ++ "\n"
-    let ns = nextPos Nice os d
+    let ns = checkWinner $ nextPos Nice os d
     putStr $ show ns ++ "\n"
     return ns
 
@@ -43,9 +58,14 @@ rollDice :: IO Int
 rollDice = randomRIO (1, 6)
 
 onField :: Int -> Int
-onField = flip mod 24
+onField x
+    | x > fieldSize = x `mod` fieldSize
+    | x == 0 = 1
+    | otherwise = x
 
 
 -- ludoInteractive :: IO()
 -- ludoInteractive = do
  
+
+-- nextPos Nice (InProgress (Player "A" 23 2) (Player "B" 24 8)) 1
