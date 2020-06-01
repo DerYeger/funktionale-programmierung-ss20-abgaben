@@ -8,12 +8,12 @@ data Strategy = Bad | Nice
 fieldSize :: Int
 fieldSize = 24
 
-data Player = Player {name::String, location::Int, remaining::Int}
+data Player = Player {name::String, origin:: Int, location::Int, remaining::Int, strat:: Maybe Strategy}
 instance Show Player where
-    show (Player n l r) = n ++ " is on " ++ show l ++ " and has " ++ show r ++ " steps left."
+    show (Player n _ l r _) = n ++ " is on " ++ show l ++ " and has " ++ show r ++ " steps left."
 
 move :: Player -> Int -> Player
-move (Player n l r) nl = Player n nl (r - rd)
+move (Player n o l r s) nl = Player n o nl (r - rd) s
     where 
         rd
             | l == nl = 0 -- didnt move
@@ -26,15 +26,21 @@ instance Show State where
     show (GameOver w) = show (name w) ++ " has won the game.\n"
 
 start :: State
-start = InProgress (Player "A" 1 fieldSize) (Player "B" 8 fieldSize)
+start = InProgress (Player "A" 1 1 fieldSize (Just Bad)) (Player "B" 8 8 fieldSize (Just Nice))
 
-nextPos _ s@(GameOver _) _ = s
-nextPos strategy (InProgress cp@(Player _ cl _) op@(Player _ ol _)) d
-    | nl /= ol = InProgress op (move cp nl) -- just move
-    | strategy == Bad = GameOver cp -- TODO Does this actually cause a loss?
-    | otherwise = InProgress op (move cp (onField nl - 1)) -- apply nice strategy
-        where 
-            nl = onField (cl + d)
+applyStrat (InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _)) Nice = InProgress op (move cp (onField ol - 1))
+applyStrat (InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _)) Bad = InProgress (toOrigin op) (move cp ol)
+
+nextPos :: State -> IO State
+nextPos s@(GameOver _) = return s
+nextPos s@(InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _)) = do
+    d <- rollDice
+    let nl = onField (cl + d)
+    if nl == ol
+        then applyStrat s <$> getStrat cp
+        else return $ InProgress op (move cp nl) -- just move
+
+toOrigin (Player n o l r s) = Player n o o fieldSize s
 
 checkWinner :: State -> State
 checkWinner s@(GameOver _) = s
@@ -51,13 +57,13 @@ onField x
     | x == 0 = 1
     | otherwise = x
 
-playRound :: Strategy -> IO State -> IO State
-playRound strat sio = do
+playRound :: IO State -> IO State
+playRound sio = do
     os <- sio
-    ns <- checkWinner . nextPos strat os <$> rollDice
-    case ns of 
+    ns <- checkWinner <$> nextPos os
+    case checkWinner ns of 
         (GameOver _) -> pure ns
-        (InProgress _ _) -> playRound (nextStrat strat) (pure ns)
+        (InProgress _ _) -> playRound (pure ns)
 
 automatedRounds :: Int -> IO (Int, Int)
 automatedRounds rc =
@@ -65,10 +71,8 @@ automatedRounds rc =
         then return(0,0) 
         else do
             (aw, bw) <- automatedRounds $ rc - 1
-            r <- playRound Bad (pure start)
-            let w =  winner r
-            let new = if name w == "A" then (aw + 1, bw) else (aw, bw + 1)
-            pure new
+            w <- winner <$> playRound (pure start)
+            if name w == "A" then return (aw + 1, bw) else return (aw, bw + 1)
 
 ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
@@ -88,3 +92,11 @@ firstWithM f (x:xs) = do
 isGameOver :: State -> Bool
 isGameOver (InProgress _ _) = False
 isGameOver (GameOver _) = True
+
+
+getStrat :: Player -> IO Strategy
+getStrat cp@(Player _ _ _ _ (Just s)) = return s
+getStrat cp@(Player _ _ _ _ Nothing) = do
+    putStr "Select your strategy (Bad, Nice)\n"
+    s <- getLine
+    if s == "Bad" then return Bad else return Nice
