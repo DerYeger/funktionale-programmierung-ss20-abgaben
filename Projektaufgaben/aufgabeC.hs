@@ -31,14 +31,13 @@ toOrigin (Player n o l r s) = Player n o o fieldSize s
 
 move :: Player -> Int -> Player
 move (Player n o l r s) nl = Player n o nl (r - rd) s
-    where 
-        rd
+    where rd
             | l == nl = 0 -- didnt move
-            | nl > l = nl - l -- move didnt pass 24
-            | otherwise = fieldSize - l + nl -- move passed 24
+            | nl > l = nl - l -- move didnt pass fieldSize
+            | otherwise = fieldSize - l + nl -- move passed fieldSize
 
 applyStrat :: State -> Strategy -> State
-applyStrat (InProgress cp op ii) Nice = InProgress op (move cp (onField (location op) - 1)) ii
+applyStrat (InProgress cp op ii) Nice = InProgress op (move cp (onField (location op - 1))) ii
 applyStrat (InProgress cp op ii) Bad = InProgress (toOrigin op) (move cp (location op)) ii
 
 getStrat :: Player -> IO Strategy
@@ -51,12 +50,12 @@ getStrat _ = do
 
 nextPos :: State -> IO State
 nextPos s@(GameOver _) = return s
-nextPos s@(InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _) ii) = do
+nextPos s@(InProgress cp op ii) = do
     d <- randomRIO (1, 6)
     printTurn s d
-    let nl = onField (cl + d)
-    if nl == ol
-        then applyStrat s <$> getStrat cp
+    let nl = onField (location cp + d)
+    if nl == location op
+        then applyStrat s <$> getStrat cp -- new location is same field as opponent
         else return $ InProgress op (move cp nl) ii -- just move
 
 checkWinner :: State -> State
@@ -70,8 +69,8 @@ playRound sio = do
     os <- sio
     ns <- checkWinner <$> nextPos os
     case checkWinner ns of 
-        (GameOver _) -> pure ns
-        InProgress{} -> playRound (pure ns)
+        GameOver{} -> pure ns -- game is over 
+        InProgress{} -> playRound (pure ns) -- continue with next turn
 
 automatedRounds :: Int -> State -> IO (Int, Int)
 automatedRounds rc start =
