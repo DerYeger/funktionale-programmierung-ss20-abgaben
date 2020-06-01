@@ -53,17 +53,18 @@ stepU arr (Step y x val score) = Step ny x nVal (score `div` nVal)
         ny = y - 1
         nVal = get arr ny x
 
--- nextSteps 3 3 testArray [initialState testArray 1 1]
-nextSteps :: Int -> Int -> Array -> [Step] -> [[Step]]
-nextSteps n m arr steps@(s@(Step y x _ _):_) = addStepU . addStepL . addStepD . addStepR $ []
+-- nextSteps 3 3 (0, 1) testArray [initialState testArray 1 1]
+nextSteps :: Int -> Int -> (Int, Int) -> Array -> [Step] -> [[Step]]
+nextSteps n m (yt, xt) arr steps@(s@(Step y x _ _):_) = addStepU . addStepL . addStepD . addStepR $ []
     where
-        addStepR xs = if x < m - 1 then addPositiveStep (stepR arr s) xs else xs
-        addStepD xs = if x < n - 1 then addPositiveStep (stepD arr s) xs else xs
-        addStepL xs = if x > 0 then addPositiveStep (stepL arr s) xs else xs
-        addStepU xs = if y > 0 then addPositiveStep (stepU arr s) xs else xs
-        addPositiveStep s xs = if score s >= 0 then addNonRepeatStep s xs else xs
-        addNonRepeatStep s xs = if s `notElem` steps then (s : steps) : xs else xs
-
-isInRange n m y x = 0 <= y && y < n && 0 <= x && x < m
+        addStepR = addIfValid (stepR arr s)
+        addStepD = addIfValid (stepD arr s)
+        addStepL = addIfValid (stepL arr s)
+        addStepU = addIfValid (stepU arr s)
+        addIfValid ns xs = if isValid ns then (ns : steps) : xs else xs
+        -- isValid <-> score is positive and step is not the target without having visited others and step is no repeat
+        isValid ns = isInRange ns && score ns >= 0 && noPrematureEnd ns && ns `notElem` steps
+        noPrematureEnd (Step y x _ _) = not (y == yt && x == xt && length steps <= n * m - 1)
+        isInRange (Step y x _ _) = 0 <= y && y < n && 0 <= x && x < m
 
 testArray = buildArray 3 3 1 2 3
