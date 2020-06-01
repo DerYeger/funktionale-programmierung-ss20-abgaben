@@ -64,7 +64,7 @@ nextSteps n m (yt, xt) arr steps@(s@(Step y x _ _):_) = addStepU . addStepL . ad
         addIfValid ns xs = if isValid ns then (ns : steps) : xs else xs
         -- isValid <-> score is positive and step is not the target without having visited others and step is no repeat
         isValid ns = isInRange ns && score ns >= 0 && noPrematureEnd ns && ns `notElem` steps
-        noPrematureEnd (Step y x _ _) = not (y == yt && x == xt && length steps <= n * m - 1)
+        noPrematureEnd (Step y x _ _) = not (y == yt && x == xt && length steps < n * m - 1)
         isInRange (Step y x _ _) = 0 <= y && y < n && 0 <= x && x < m
 
 testArray = buildArray 3 3 1 2 3
