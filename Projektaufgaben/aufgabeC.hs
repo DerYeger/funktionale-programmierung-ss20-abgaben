@@ -72,7 +72,7 @@ playRound s = checkGameOver <$> turn s >>= \ns -> case ns of
 playRounds :: Int -> State -> IO (Int, Int)
 playRounds rc start =
     if rc <= 0 
-        then return(0,0) 
+        then return (0,0) 
         else do
             (aw, bw) <- playRounds (rc - 1) start
             w <- winner <$> playRound start
