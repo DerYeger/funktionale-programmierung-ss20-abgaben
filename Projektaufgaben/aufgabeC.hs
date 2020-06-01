@@ -21,34 +21,31 @@ move (Player n o l r s) nl = Player n o nl (r - rd) s
             | nl > l = nl - l -- move didnt pass 24
             | otherwise = fieldSize - l + nl -- move passed 24
 
-data State = InProgress {currentPlayer::Player, otherPlayer::Player} | GameOver {winner::Player}
+data State = InProgress {currentPlayer::Player, otherPlayer::Player, isInteractive::Bool} | GameOver {winner::Player}
 instance Show State where
-    show (InProgress cp op) = "Current Player: " ++ show cp ++ "\nWaiting Player: " ++ show op ++ "\n"
+    show (InProgress cp op _) = "Current Player: " ++ show cp ++ "\nWaiting Player: " ++ show op ++ "\n"
     show (GameOver w) = "Player "++ name w ++ " has won the game.\n"
 
-start :: State
-start = InProgress (Player "A" 1 1 fieldSize (Just Bad)) (Player "B" 8 8 fieldSize (Just Nice))
-
 applyStrat :: State -> Strategy -> State
-applyStrat (InProgress cp op) Nice = InProgress op (move cp (onField (location op) - 1))
-applyStrat (InProgress cp op) Bad = InProgress (toOrigin op) (move cp (location op))
+applyStrat (InProgress cp op ii) Nice = InProgress op (move cp (onField (location op) - 1)) ii
+applyStrat (InProgress cp op ii) Bad = InProgress (toOrigin op) (move cp (location op)) ii
 
 nextPos :: State -> IO State
 nextPos s@(GameOver _) = return s
-nextPos s@(InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _)) = do
+nextPos s@(InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _) ii) = do
     d <- randomRIO (1, 6)
-    printState s d (isInteractiveGame s)
+    printState s d
     let nl = onField (cl + d)
     if nl == ol
         then applyStrat s <$> getStrat cp
-        else return $ InProgress op (move cp nl) -- just move
+        else return $ InProgress op (move cp nl) ii -- just move
 
 toOrigin :: Player -> Player
 toOrigin (Player n o l r s) = Player n o o fieldSize s
 
 checkWinner :: State -> State
 checkWinner s@(GameOver _) = s
-checkWinner s@(InProgress _ p)
+checkWinner s@(InProgress _ p _)
     | remaining p > 0 = s
     | otherwise = GameOver p
 
@@ -64,7 +61,7 @@ playRound sio = do
     ns <- checkWinner <$> nextPos os
     case checkWinner ns of 
         (GameOver _) -> pure ns
-        (InProgress _ _) -> playRound (pure ns)
+        InProgress{} -> playRound (pure ns)
 
 automatedRounds :: Int -> State -> IO (Int, Int)
 automatedRounds rc start =
@@ -79,7 +76,7 @@ ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
     let playerA = Player "A" 1 1 fieldSize (Just Bad)
     let playerB = Player "B" 8 8 fieldSize (Just Nice)
-    (aw, bw) <- automatedRounds rc (InProgress playerA playerB)
+    (aw, bw) <- automatedRounds rc (InProgress playerA playerB False)
     putStr $ "A has won " ++ show aw ++ " round(s) using the " ++ show (fromJust (strat playerA)) ++ " strategy.\n"
         ++ "B has won " ++ show bw ++ " round(s) using the " ++ show (fromJust (strat playerB)) ++ " strategy.\n"
 
@@ -90,15 +87,11 @@ getStrat _ = do
     strat <- getLine
     if strat == "Bad" then return Bad else return Nice
 
-isInteractiveGame :: State -> Bool
-isInteractiveGame (InProgress cp op) = isHumanPlayer cp || isHumanPlayer op
-    where 
-        isHumanPlayer (Player _ _ _ _ Nothing) =  True
-        isHumanPlayer _ = False
-
 ludoInteractive :: IO State
-ludoInteractive = playRound (pure $ InProgress (Player "A" 1 1 fieldSize Nothing) (Player "B" 8 8 fieldSize (Just Bad)))
+ludoInteractive = playRound (pure $ InProgress (Player "A" 1 1 fieldSize Nothing) (Player "B" 8 8 fieldSize (Just Bad)) True)
 
-printState :: State -> Int -> Bool -> IO ()
-printState s@(InProgress cp _) d True = putStr $ show s ++ name cp ++ " has rolled a " ++ show d ++ "\n\n"
-printState _ _ _ = return ()
+printState :: State -> Int -> IO ()
+printState s@(InProgress cp _ isInteractive) d = 
+    if isInteractive
+        then putStr $ show s ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n" 
+        else return()
