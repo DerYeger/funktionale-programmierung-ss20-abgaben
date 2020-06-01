@@ -84,9 +84,10 @@ ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
     let playerA = Player "A" 1 1 fieldSize (Just Bad)
     let playerB = Player "B" 8 8 fieldSize (Just Nice)
+    let printWins p w = putStr $ name p ++ " has won " ++ show w ++ " round(s) using the " ++ (show . fromJust . strat $ p) ++ " strategy.\n"
     (aw, bw) <- playRounds rc (InProgress playerA playerB False)
-    putStr $ "A has won " ++ show aw ++ " round(s) using the " ++ show (fromJust (strat playerA)) ++ " strategy.\n"
-        ++ "B has won " ++ show bw ++ " round(s) using the " ++ show (fromJust (strat playerB)) ++ " strategy.\n"
+    printWins playerA aw
+    printWins playerB bw 
 
 ludoInteractive :: IO State
 ludoInteractive = playRound $ InProgress (Player "A" 1 1 fieldSize Nothing) (Player "B" 8 8 fieldSize (Just Bad)) True
