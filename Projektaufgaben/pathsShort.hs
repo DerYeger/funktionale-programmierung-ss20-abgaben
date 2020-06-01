@@ -7,6 +7,8 @@ type Array = [[Int]]
 data Step = Step {y::Int, x::Int, val::Int, score::Int}
 instance Show Step where
     show (Step y x val score) = "(" ++ show y ++ "," ++ show x ++ "," ++ show val ++ "," ++ show score ++ ")"
+instance Eq Step where
+    (Step fy fx _ _) == (Step sy sx _ _) = fy == sy && fx == sx
 
 get :: Array -> Int -> Int -> Int
 get arr y x = (arr !! y) !! x
@@ -53,12 +55,15 @@ stepU arr (Step y x val score) = Step ny x nVal (score `div` nVal)
 
 -- nextSteps 3 3 testArray [initialState testArray 1 1]
 nextSteps :: Int -> Int -> Array -> [Step] -> [[Step]]
-nextSteps m n arr steps@(s:_) = addStepU . addStepL . addStepD . addStepR $ []
+nextSteps n m arr steps@(s@(Step y x _ _):_) = addStepU . addStepL . addStepD . addStepR $ []
     where
-        addStepR xs = if x s < m - 1 then addPositiveStep (stepR arr s) xs else xs
-        addStepD xs = if x s < n - 1 then addPositiveStep (stepD arr s) xs else xs
-        addStepL xs = if x s > 0 then addPositiveStep (stepL arr s) xs else xs
-        addStepU xs = if y s > 0 then addPositiveStep (stepU arr s) xs else xs
-        addPositiveStep s xs = if score s >= 0 then (s : steps) : xs else xs
+        addStepR xs = if x < m - 1 then addPositiveStep (stepR arr s) xs else xs
+        addStepD xs = if x < n - 1 then addPositiveStep (stepD arr s) xs else xs
+        addStepL xs = if x > 0 then addPositiveStep (stepL arr s) xs else xs
+        addStepU xs = if y > 0 then addPositiveStep (stepU arr s) xs else xs
+        addPositiveStep s xs = if score s >= 0 then addNonRepeatStep s xs else xs
+        addNonRepeatStep s xs = if s `notElem` steps then (s : steps) : xs else xs
+
+isInRange n m y x = 0 <= y && y < n && 0 <= x && x < m
 
 testArray = buildArray 3 3 1 2 3
