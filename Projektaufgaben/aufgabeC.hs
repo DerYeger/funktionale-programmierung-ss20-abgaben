@@ -48,9 +48,9 @@ getStrat _ = do
     putStr "\n"
     if strat == "Bad" then return Bad else return Nice
 
-nextPos :: State -> IO State
-nextPos s@(GameOver _) = return s
-nextPos s@(InProgress cp op ii) = do
+turn :: State -> IO State
+turn s@(GameOver _) = return s
+turn s@(InProgress cp op ii) = do
     d <- randomRIO (1, 6)
     printTurn s d
     let nl = onField (location cp + d)
@@ -58,16 +58,16 @@ nextPos s@(InProgress cp op ii) = do
         then applyStrat s <$> getStrat cp -- new location is same field as opponent
         else return $ InProgress op (move cp nl) ii -- just move
 
-checkWinner :: State -> State
-checkWinner s@(GameOver _) = s
-checkWinner s@(InProgress _ p _)
+checkGameOver :: State -> State
+checkGameOver s@(GameOver _) = s
+checkGameOver s@(InProgress _ p _)
     | remaining p > 0 = s
     | otherwise = GameOver p
 
 playRound :: State -> IO State
 playRound s = do
-    ns <- checkWinner <$> nextPos s
-    case checkWinner ns of 
+    ns <- checkGameOver <$> turn s
+    case checkGameOver ns of 
         GameOver{} -> return ns -- game is over 
         InProgress{} -> playRound ns -- continue with next turn
 
