@@ -65,11 +65,9 @@ checkGameOver s@(InProgress _ p _)
     | otherwise = GameOver p
 
 playRound :: State -> IO State
-playRound s = do
-    ns <- checkGameOver <$> turn s
-    case ns of 
-        GameOver{} -> return ns -- game is over 
-        InProgress{} -> playRound ns -- continue with next turn
+playRound s = checkGameOver <$> turn s >>= \ns -> case ns of
+    GameOver{} -> return ns -- game is over 
+    InProgress{} -> playRound ns -- continue with next turn
 
 playRounds :: Int -> State -> IO (Int, Int)
 playRounds rc start =
