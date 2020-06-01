@@ -51,17 +51,13 @@ onField x
     | x == 0 = 1
     | otherwise = x
 
-automatedTurn :: Strategy -> IO State -> IO State
-automatedTurn strat sio = do
-    d <- rollDice
+playRound :: Strategy -> IO State -> IO State
+playRound strat sio = do
     os <- sio
-    let cpName = name . currentPlayer $ os
-    -- putStr $ cpName ++ " rolled " ++ show d ++ " and uses the " ++ show strat ++ " strategy.\n"
-    let ns = checkWinner $ nextPos strat os d
-    -- putStr $ show ns ++ "\n"
+    ns <- checkWinner . nextPos strat os <$> rollDice
     case ns of 
         (GameOver _) -> pure ns
-        (InProgress _ _) -> automatedTurn (nextStrat strat) (pure ns)
+        (InProgress _ _) -> playRound (nextStrat strat) (pure ns)
 
 automatedRounds :: Int -> IO (Int, Int)
 automatedRounds rc =
@@ -69,7 +65,7 @@ automatedRounds rc =
         then return(0,0) 
         else do
             (aw, bw) <- automatedRounds $ rc - 1
-            r <- automatedTurn Bad (pure start)
+            r <- playRound Bad (pure start)
             let w =  winner r
             let new = if name w == "A" then (aw + 1, bw) else (aw, bw + 1)
             pure new
@@ -83,3 +79,12 @@ ludoStatistic rc = do
 nextStrat :: Strategy -> Strategy
 nextStrat Bad = Nice
 nextStrat Nice = Bad
+
+firstWithM :: Monad m => (a -> Bool) -> [m a] -> m a
+firstWithM f (x:xs) = do
+    r <- f <$> x
+    if r then x else firstWithM f xs
+
+isGameOver :: State -> Bool
+isGameOver (InProgress _ _) = False
+isGameOver (GameOver _) = True
