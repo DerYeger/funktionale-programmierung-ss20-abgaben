@@ -67,7 +67,7 @@ checkGameOver s@(InProgress _ p _)
 playRound :: State -> IO State
 playRound s = do
     ns <- checkGameOver <$> turn s
-    case checkGameOver ns of 
+    case ns of 
         GameOver{} -> return ns -- game is over 
         InProgress{} -> playRound ns -- continue with next turn
 
@@ -94,4 +94,4 @@ ludoInteractive = playRound $ InProgress (Player "A" 1 1 fieldSize Nothing) (Pla
 
 printTurn :: State -> Int -> IO ()
 printTurn s@(InProgress cp _ isInteractive) d = 
-    when isInteractive . putStr $ show s ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n" 
+    when isInteractive . putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n" 
