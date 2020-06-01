@@ -64,33 +64,32 @@ checkWinner s@(InProgress _ p _)
     | remaining p > 0 = s
     | otherwise = GameOver p
 
-playRound :: IO State -> IO State
-playRound sio = do
-    os <- sio
-    ns <- checkWinner <$> nextPos os
+playRound :: State -> IO State
+playRound s = do
+    ns <- checkWinner <$> nextPos s
     case checkWinner ns of 
-        GameOver{} -> pure ns -- game is over 
-        InProgress{} -> playRound (pure ns) -- continue with next turn
+        GameOver{} -> return ns -- game is over 
+        InProgress{} -> playRound ns -- continue with next turn
 
-automatedRounds :: Int -> State -> IO (Int, Int)
-automatedRounds rc start =
+playRounds :: Int -> State -> IO (Int, Int)
+playRounds rc start =
     if rc <= 0 
         then return(0,0) 
         else do
-            (aw, bw) <- automatedRounds (rc - 1) start
-            w <- winner <$> playRound (pure start)
+            (aw, bw) <- playRounds (rc - 1) start
+            w <- winner <$> playRound start
             if name w == name (currentPlayer start) then return (aw + 1, bw) else return (aw, bw + 1)
 
 ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
     let playerA = Player "A" 1 1 fieldSize (Just Bad)
     let playerB = Player "B" 8 8 fieldSize (Just Nice)
-    (aw, bw) <- automatedRounds rc (InProgress playerA playerB False)
+    (aw, bw) <- playRounds rc (InProgress playerA playerB False)
     putStr $ "A has won " ++ show aw ++ " round(s) using the " ++ show (fromJust (strat playerA)) ++ " strategy.\n"
         ++ "B has won " ++ show bw ++ " round(s) using the " ++ show (fromJust (strat playerB)) ++ " strategy.\n"
 
 ludoInteractive :: IO State
-ludoInteractive = playRound (pure $ InProgress (Player "A" 1 1 fieldSize Nothing) (Player "B" 8 8 fieldSize (Just Bad)) True)
+ludoInteractive = playRound $ InProgress (Player "A" 1 1 fieldSize Nothing) (Player "B" 8 8 fieldSize (Just Bad)) True
 
 printTurn :: State -> Int -> IO ()
 printTurn s@(InProgress cp _ isInteractive) d = 
