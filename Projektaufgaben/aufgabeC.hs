@@ -28,13 +28,14 @@ instance Show State where
 start :: State
 start = InProgress (Player "A" 1 1 fieldSize (Just Bad)) (Player "B" 8 8 fieldSize (Just Nice))
 
-applyStrat (InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _)) Nice = InProgress op (move cp (onField ol - 1))
-applyStrat (InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _)) Bad = InProgress (toOrigin op) (move cp ol)
+applyStrat :: State -> Strategy -> State
+applyStrat (InProgress cp op) Nice = InProgress op (move cp (onField (location op) - 1))
+applyStrat (InProgress cp op) Bad = InProgress (toOrigin op) (move cp (location op))
 
 nextPos :: State -> IO State
 nextPos s@(GameOver _) = return s
 nextPos s@(InProgress cp@(Player _ _ cl _ _) op@(Player _ _ ol _ _)) = do
-    d <- rollDice
+    d <- randomRIO (1, 6)
     let nl = onField (cl + d)
     if nl == ol
         then applyStrat s <$> getStrat cp
@@ -47,9 +48,6 @@ checkWinner s@(GameOver _) = s
 checkWinner s@(InProgress _ p)
     | remaining p > 0 = s
     | otherwise = GameOver p
-
-rollDice :: IO Int
-rollDice = randomRIO (1, 6)
 
 onField :: Int -> Int
 onField x
@@ -80,23 +78,9 @@ ludoStatistic rc = do
     putStr $ "A has won " ++ show aw ++ " round(s) using the " ++ show Bad ++ " strategy.\n"
         ++ "B has won " ++ show bw ++ " round(s) using the " ++ show Nice ++ " strategy.\n"
 
-nextStrat :: Strategy -> Strategy
-nextStrat Bad = Nice
-nextStrat Nice = Bad
-
-firstWithM :: Monad m => (a -> Bool) -> [m a] -> m a
-firstWithM f (x:xs) = do
-    r <- f <$> x
-    if r then x else firstWithM f xs
-
-isGameOver :: State -> Bool
-isGameOver (InProgress _ _) = False
-isGameOver (GameOver _) = True
-
-
 getStrat :: Player -> IO Strategy
-getStrat cp@(Player _ _ _ _ (Just s)) = return s
-getStrat cp@(Player _ _ _ _ Nothing) = do
+getStrat (Player _ _ _ _ (Just s)) = return s
+getStrat _ = do
     putStr "Select your strategy (Bad, Nice)\n"
     s <- getLine
     if s == "Bad" then return Bad else return Nice
