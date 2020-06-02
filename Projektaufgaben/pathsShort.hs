@@ -32,26 +32,6 @@ buildRow m i z1 z2 z3 = foldl' next (z1, z2, []) [0..m-1]
                 nz2 = (cz2 * z3) `mod` 100
             in (nz1, nz2, xs ++ [x])
 
-stepR arr (Step y x val score) = Step y nx nVal (score + nVal)
-    where 
-        nx = x + 1
-        nVal = get arr y nx
-
-stepD arr (Step y x val score) = Step ny x nVal (score * nVal)
-    where 
-        ny = y + 1
-        nVal = get arr ny x
-
-stepL arr (Step y x val score) = Step y nx nVal (score - nVal)
-    where 
-        nx = x - 1
-        nVal = get arr y nx
-
-stepU arr (Step y x val score) = Step ny x nVal (score `div` nVal)
-    where 
-        ny = y - 1
-        nVal = get arr ny x
-
 -- pathsShort 3 3 0 0 2 2 1 2 3
 -- pathsShort 2 3 0 0 1 2 1 2 3
 -- pathsShort 2 4 0 0 1 3 123 456 789
@@ -61,8 +41,10 @@ pathsShort n m ys xs yt xt z1 z2 z3 = map reverse paths
         sVal = get arr ys xs
         arr = buildArray n m z1 z2 z3
         paths = iterate (concatMap nextSteps) [[Step ys xs sVal sVal]] !! (n * m - 1)
-        nextSteps steps@(s@(Step y x _ _):_) = addIfValid (stepU arr s) . addIfValid (stepL arr s) . addIfValid (stepD arr s) . addIfValid (stepR arr s) $ []
+        nextSteps steps@(s@(Step y x _ sc):_) = addIfValid (move (y-1) x div) . addIfValid (move y (x-1) (-)) . addIfValid (move (y+1) x (*)) . addIfValid (move y (x+1) (+)) $ []
             where
+                move ny nx op = Step ny nx nVal (sc `op` nVal)
+                    where nVal = get arr ny nx
                 addIfValid n ps = if isValid n then (n : steps) : ps else ps
                 isValid n = isInRange n && score n >= 0 && noPrematureEnd n && n `notElem` steps
                 isInRange (Step y x _ _) = 0 <= y && y < n && 0 <= x && x < m
