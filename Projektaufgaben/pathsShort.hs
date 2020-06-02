@@ -19,11 +19,8 @@ buildArray n m z1 z2 z3 = let (_, _, rs) = foldl nextRow (z1, z2, []) [0..n-1] i
 buildRow :: Int -> Int -> Int -> Int -> Int -> (Int, Int, [Int])
 buildRow m i z1 z2 z3 = foldl' next (z1, z2, []) [0..m-1]
     where next (cz1, cz2, xs) j = 
-            let 
-                x = ((cz1 * i + cz2 * j) `mod` 9) + 1
-                nz1 = (cz1 + z3) `mod` 100
-                nz2 = (cz2 * z3) `mod` 100
-            in (nz1, nz2, xs ++ [x])
+            let x = ((cz1 * i + cz2 * j) `mod` 9) + 1
+            in ((cz1 + z3) `mod` 100, (cz2 * z3) `mod` 100, xs ++ [x])
 
 -- pathsShort 3 3 0 0 2 2 1 2 3
 -- pathsShort 2 3 0 0 1 2 1 2 3
