@@ -10,6 +10,8 @@ instance Show Step where
 instance Eq Step where
     (Step fy fx _ _) == (Step sy sx _ _) = fy == sy && fx == sx
 
+type Path = [Step]
+
 get :: Array -> Int -> Int -> Int
 get arr y x = (arr !! y) !! x
 
@@ -53,8 +55,7 @@ stepU arr (Step y x val score) = Step ny x nVal (score `div` nVal)
         ny = y - 1
         nVal = get arr ny x
 
--- nextSteps 3 3 (0, 1) testArray [initialState testArray 1 1]
-nextSteps :: Int -> Int -> (Int, Int) -> Array -> [Step] -> [[Step]]
+nextSteps :: Int -> Int -> (Int, Int) -> Array -> Path -> [Path]
 nextSteps n m (yt, xt) arr steps@(s@(Step y x _ _):_) = addStepU . addStepL . addStepD . addStepR $ []
     where
         addStepR = addIfValid (stepR arr s)
@@ -67,4 +68,13 @@ nextSteps n m (yt, xt) arr steps@(s@(Step y x _ _):_) = addStepU . addStepL . ad
         noPrematureEnd (Step y x _ _) = not (y == yt && x == xt && length steps < n * m - 1)
         isInRange (Step y x _ _) = 0 <= y && y < n && 0 <= x && x < m
 
-testArray = buildArray 3 3 1 2 3
+-- iter 3 3 (0, 0) (2, 2) testArray
+iter n m (sy, sx) t arr = iterate helper [[initialState arr sy sx]] !! (n * m - 1)
+    where helper = concatMap (nextSteps n m t arr)
+
+-- pathsShort 3 3 0 0 2 2 1 2 3
+-- pathsShort 2 3 0 0 1 2 1 2 3
+-- pathsShort 2 4 0 0 1 3 123 456 789
+-- pathsShort 2 4 0 0 1 2 5 5 5
+pathsShort n m is js ie je z1 z2 z3 = map reverse (iter n m (is, js) (ie, je) arr)
+    where arr = buildArray n m z1 z2 z3
