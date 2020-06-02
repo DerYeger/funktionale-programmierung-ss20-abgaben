@@ -32,9 +32,6 @@ buildRow m i z1 z2 z3 = foldl' next (z1, z2, []) [0..m-1]
                 nz2 = (cz2 * z3) `mod` 100
             in (nz1, nz2, xs ++ [x])
 
-initialState arr y x = Step y x val val
-    where val = get arr y x
-
 stepR arr (Step y x val score) = Step y nx nVal (score + nVal)
     where 
         nx = x + 1
@@ -55,24 +52,18 @@ stepU arr (Step y x val score) = Step ny x nVal (score `div` nVal)
         ny = y - 1
         nVal = get arr ny x
 
-nextSteps :: Int -> Int ->Int -> Int -> Array -> Path -> [Path]
-nextSteps n m yt xt arr steps@(s@(Step y x _ _):_) = addStepU . addStepL . addStepD . addStepR $ []
-    where
-        addStepR = addIfValid (stepR arr s)
-        addStepD = addIfValid (stepD arr s)
-        addStepL = addIfValid (stepL arr s)
-        addStepU = addIfValid (stepU arr s)
-        addIfValid ns xs = if isValid ns then (ns : steps) : xs else xs
-        -- isValid <-> score is positive and step is not the target without having visited others and step is no repeat
-        isValid ns = isInRange ns && score ns >= 0 && noPrematureEnd ns && ns `notElem` steps
-        noPrematureEnd (Step y x _ _) = not (y == yt && x == xt && length steps < n * m - 1)
-        isInRange (Step y x _ _) = 0 <= y && y < n && 0 <= x && x < m
-
 -- pathsShort 3 3 0 0 2 2 1 2 3
 -- pathsShort 2 3 0 0 1 2 1 2 3
 -- pathsShort 2 4 0 0 1 3 123 456 789
 -- pathsShort 2 4 0 0 1 2 5 5 5
 pathsShort n m ys xs yt xt z1 z2 z3 = map reverse paths
     where 
+        sVal = get arr ys xs
         arr = buildArray n m z1 z2 z3
-        paths = iterate (concatMap (nextSteps n m yt xt arr)) [[initialState arr ys xs]] !! (n * m - 1)
+        paths = iterate (concatMap nextSteps) [[Step ys xs sVal sVal]] !! (n * m - 1)
+        nextSteps steps@(s@(Step y x _ _):_) = addIfValid (stepU arr s) . addIfValid (stepL arr s) . addIfValid (stepD arr s) . addIfValid (stepR arr s) $ []
+            where
+                addIfValid n ps = if isValid n then (n : steps) : ps else ps
+                isValid n = isInRange n && score n >= 0 && noPrematureEnd n && n `notElem` steps
+                isInRange (Step y x _ _) = 0 <= y && y < n && 0 <= x && x < m
+                noPrematureEnd (Step y x _ _) = y /= yt || x /= xt || length steps == n * m - 1
