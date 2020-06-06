@@ -28,14 +28,14 @@ instance Show State where
 
 move :: Player -> Int -> Player
 move (Player n o Nothing st s) d = Player n o (Just $ o + d - 1) (d - 1) s
-move p@(Player n o jl@(Just l) st s) d = Player n o (Just . onField $ l + d) (st + d) s
+move (Player n o (Just l) st s) d = Player n o (Just . onField $ l + d) (st + d) s
 
 justLocation :: Player -> Int
 justLocation p = fromJust (location p)
 
 applyStrat :: State -> Int -> Strategy -> State
 applyStrat (InProgress cp op ii) d strat = case strat of
-    Nice -> InProgress op (move cp (d - 1)) ii
+    Nice -> InProgress op (move cp $ d - 1) ii
     Bad -> InProgress (toOrigin op) (move cp d) ii
         where toOrigin (Player n o _ _ s) = Player n o Nothing 0 s
 
