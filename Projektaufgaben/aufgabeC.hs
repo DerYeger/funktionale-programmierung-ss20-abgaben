@@ -27,8 +27,8 @@ instance Show State where
     show (GameOver w) = "Player "++ name w ++ " has won the game.\n"
 
 move :: Player -> Int -> Player
-move (Player n o s Nothing st) d = Player n o s (Just $ o + d - 1) (d - 1)
-move (Player n o s (Just l) st) d = Player n o s (Just . onField $ l + d) (st + d)
+move (Player n o s Nothing st) d = Player n o s (Just $ o + d - 1) $ d - 1
+move (Player n o s (Just l) st) d = Player n o s (Just . onField $ l + d) $ st + d
 
 justLocation :: Player -> Int
 justLocation p = fromJust $ location p
