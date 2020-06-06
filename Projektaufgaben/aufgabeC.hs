@@ -64,11 +64,9 @@ turn s@(GameOver _) = return s
 turn s@(InProgress cp op ii) = do
     d <- randomRIO (1, 6)
     printTurn s d
-    if isOnField cp then
-        if isOnField op && onField (d + fromJust (location cp)) == fromJust (location op)
-            then applyStrat s <$> getStrat cp -- new location is same field as opponent
-            else return $ InProgress op (move cp d) ii -- just move
-    else return $ InProgress op (move cp d) ii -- just move
+    if isOnField cp && isOnField op && onField (d + justLocation cp) == justLocation op
+        then applyStrat s <$> getStrat cp -- new location is same field as opponent
+        else return $ InProgress op (move cp d) ii -- just move
 
 checkGameOver :: State -> State
 checkGameOver s@(GameOver _) = s
