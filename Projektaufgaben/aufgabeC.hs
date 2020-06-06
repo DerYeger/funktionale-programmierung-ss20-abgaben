@@ -16,19 +16,19 @@ onField x
 data Strategy = Bad | Nice
     deriving (Eq, Show)
 
-data Player = Player {name::String, origin::Int, location::Maybe Int, stepsTaken::Int, strat::Maybe Strategy}
+data Player = Player {name::String, origin::Int, strat::Maybe Strategy, location::Maybe Int, stepsTaken::Int}
 instance Show Player where
-    show (Player n _ l st _) = n ++ " is on " ++ show l ++ " and has " ++ show (fieldSize - st)++ " steps left."
+    show (Player n _ _ l st) = n ++ " is on " ++ show l ++ " and has " ++ show (fieldSize - st)++ " steps left."
 
 
 data State = InProgress {isInteractive::Bool, currentPlayer::Player, otherPlayer::Player} | GameOver {winner::Player}
 instance Show State where
-    show (InProgress cp op _) = "Current Player: " ++ show cp ++ "\nWaiting Player: " ++ show op ++ "\n"
+    show (InProgress _ cp op) = "Current Player: " ++ show cp ++ "\nWaiting Player: " ++ show op ++ "\n"
     show (GameOver w) = "Player "++ name w ++ " has won the game.\n"
 
 move :: Player -> Int -> Player
-move (Player n o Nothing st s) d = Player n o (Just $ o + d - 1) (d - 1) s
-move (Player n o (Just l) st s) d = Player n o (Just . onField $ l + d) (st + d) s
+move (Player n o s Nothing st) d = Player n o s (Just $ o + d - 1) (d - 1)
+move (Player n o s (Just l) st) d = Player n o s (Just . onField $ l + d) (st + d)
 
 justLocation :: Player -> Int
 justLocation p = fromJust $ location p
@@ -37,15 +37,15 @@ applyStrat :: State -> Int -> Strategy -> State
 applyStrat (InProgress ii cp op) d strat = case strat of
     Nice -> InProgress ii op $ move cp $ d - 1
     Bad -> InProgress ii (toOrigin op) $ move cp d
-        where toOrigin (Player n o _ _ s) = Player n o Nothing 0 s
+        where toOrigin (Player n o s _ _ ) = Player n o s Nothing 0
 
 getStrat :: Player -> IO Strategy
-getStrat (Player _ _ _ _ (Just strat)) = return strat
+getStrat (Player _ _ (Just s) _ _) = return s
 getStrat _ = do
     putStr "Select your strategy (Bad == Bad, Otherwise == Nice)\n"
-    strat <- getLine
+    s <- getLine
     putStr "\n"
-    if strat == "Bad" then return Bad else return Nice
+    if s == "Bad" then return Bad else return Nice
 
 isOnField :: Player -> Bool
 isOnField p = case location p of 
@@ -83,15 +83,15 @@ playRounds rc start =
 
 ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
-    let playerA = Player "A" 1 Nothing 0 (Just Bad)
-    let playerB = Player "B" 8 Nothing 0 (Just Nice)
+    let playerA = Player "A" 1 (Just Bad) Nothing 0 
+    let playerB = Player "B" 8 (Just Nice) Nothing 0 
     let printWins p w = putStr $ name p ++ " has won " ++ show w ++ " round(s) using the " ++ (show . fromJust . strat $ p) ++ " strategy.\n"
     (aw, bw) <- playRounds rc (InProgress False playerA playerB)
     printWins playerA aw
     printWins playerB bw 
 
 ludoInteractive :: IO State
-ludoInteractive = playRound $ InProgress True (Player "A" 1 Nothing 0 Nothing) (Player "B" 8 Nothing 0 (Just Bad))
+ludoInteractive = playRound $ InProgress True (Player "A" 1 Nothing Nothing 0) (Player "B" 8 (Just Bad) Nothing 0)
 
 printTurn :: State -> Int -> IO ()
 printTurn s@(InProgress ii cp _) d = 
