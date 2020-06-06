@@ -35,8 +35,8 @@ justLocation p = fromJust $ location p
 
 applyStrat :: State -> Int -> Strategy -> State
 applyStrat (InProgress ii cp op) d strat = case strat of
-    Nice -> InProgress ii op (move cp $ d - 1)
-    Bad -> InProgress ii (toOrigin op) (move cp d)
+    Nice -> InProgress ii op $ move cp $ d - 1
+    Bad -> InProgress ii (toOrigin op) $ move cp d
         where toOrigin (Player n o _ _ s) = Player n o Nothing 0 s
 
 getStrat :: Player -> IO Strategy
