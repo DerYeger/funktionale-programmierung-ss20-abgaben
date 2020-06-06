@@ -33,14 +33,11 @@ move p@(Player n o jl@(Just l) st s) d = Player n o (Just . onField $ l + d) (st
 justLocation :: Player -> Int
 justLocation p = fromJust (location p)
 
-applyStrat :: State -> Strategy -> State
--- applyStrat (InProgress cp op ii) Nice = InProgress op (move cp (onField (diff (location cp) (justLocation op - 1)))) ii
-applyStrat (InProgress cp op ii) strat = case strat of
-    Nice -> InProgress op (move cp (onField (diff (justLocation cp) (justLocation op - 1)))) ii
-    Bad -> InProgress (toOrigin op) (move cp (diff (justLocation cp) (justLocation op))) ii
-    where 
-        diff a b = if b > a then b - a else fieldSize - a + b
-        toOrigin (Player n o _ _ s) = Player n o Nothing 0 s
+applyStrat :: State -> Int -> Strategy -> State
+applyStrat (InProgress cp op ii) d strat = case strat of
+    Nice -> InProgress op (move cp (d - 1)) ii
+    Bad -> InProgress (toOrigin op) (move cp d) ii
+        where toOrigin (Player n o _ _ s) = Player n o Nothing 0 s
 
 getStrat :: Player -> IO Strategy
 getStrat (Player _ _ _ _ (Just strat)) = return strat
@@ -61,7 +58,7 @@ turn s@(InProgress cp op ii) = do
     d <- randomRIO (1, 6)
     printTurn s d
     if isOnField cp && isOnField op && onField (d + justLocation cp) == justLocation op
-        then applyStrat s <$> getStrat cp -- new location is same field as opponent
+        then applyStrat s d <$> getStrat cp -- new location is same field as opponent
         else return $ InProgress op (move cp d) ii -- just move
 
 checkGameOver :: State -> State
