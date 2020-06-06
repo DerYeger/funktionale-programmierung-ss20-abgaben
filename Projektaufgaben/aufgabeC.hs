@@ -21,7 +21,7 @@ instance Show Player where
     show (Player n _ l st _) = n ++ " is on " ++ show l ++ " and has " ++ show (fieldSize - st)++ " steps left."
 
 
-data State = InProgress {currentPlayer::Player, otherPlayer::Player, isInteractive::Bool} | GameOver {winner::Player}
+data State = InProgress {isInteractive::Bool, currentPlayer::Player, otherPlayer::Player} | GameOver {winner::Player}
 instance Show State where
     show (InProgress cp op _) = "Current Player: " ++ show cp ++ "\nWaiting Player: " ++ show op ++ "\n"
     show (GameOver w) = "Player "++ name w ++ " has won the game.\n"
@@ -31,12 +31,12 @@ move (Player n o Nothing st s) d = Player n o (Just $ o + d - 1) (d - 1) s
 move (Player n o (Just l) st s) d = Player n o (Just . onField $ l + d) (st + d) s
 
 justLocation :: Player -> Int
-justLocation p = fromJust (location p)
+justLocation p = fromJust $ location p
 
 applyStrat :: State -> Int -> Strategy -> State
-applyStrat (InProgress cp op ii) d strat = case strat of
-    Nice -> InProgress op (move cp $ d - 1) ii
-    Bad -> InProgress (toOrigin op) (move cp d) ii
+applyStrat (InProgress ii cp op) d strat = case strat of
+    Nice -> InProgress ii op (move cp $ d - 1)
+    Bad -> InProgress ii (toOrigin op) (move cp d)
         where toOrigin (Player n o _ _ s) = Player n o Nothing 0 s
 
 getStrat :: Player -> IO Strategy
@@ -54,16 +54,16 @@ isOnField p = case location p of
 
 turn :: State -> IO State
 turn s@(GameOver _) = return s
-turn s@(InProgress cp op ii) = do
+turn s@(InProgress ii cp op) = do
     d <- randomRIO (1, 6)
     printTurn s d
     if isOnField cp && isOnField op && onField (d + justLocation cp) == justLocation op
         then applyStrat s d <$> getStrat cp -- new location is same field as opponent
-        else return $ InProgress op (move cp d) ii -- just move
+        else return $ InProgress ii op (move cp d) -- just move
 
 checkGameOver :: State -> State
 checkGameOver s@(GameOver _) = s
-checkGameOver s@(InProgress _ p _)
+checkGameOver s@(InProgress _ _ p)
     | stepsTaken p < fieldSize = s
     | otherwise = GameOver p
 
@@ -86,13 +86,13 @@ ludoStatistic rc = do
     let playerA = Player "A" 1 Nothing 0 (Just Bad)
     let playerB = Player "B" 8 Nothing 0 (Just Nice)
     let printWins p w = putStr $ name p ++ " has won " ++ show w ++ " round(s) using the " ++ (show . fromJust . strat $ p) ++ " strategy.\n"
-    (aw, bw) <- playRounds rc (InProgress playerA playerB False)
+    (aw, bw) <- playRounds rc (InProgress False playerA playerB)
     printWins playerA aw
     printWins playerB bw 
 
 ludoInteractive :: IO State
-ludoInteractive = playRound $ InProgress (Player "A" 1 Nothing 0 Nothing) (Player "B" 8 Nothing 0 (Just Bad)) True
+ludoInteractive = playRound $ InProgress True (Player "A" 1 Nothing 0 Nothing) (Player "B" 8 Nothing 0 (Just Bad))
 
 printTurn :: State -> Int -> IO ()
-printTurn s@(InProgress cp _ isInteractive) d = 
-    when isInteractive . putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n" 
+printTurn s@(InProgress ii cp _) d = 
+    when ii . putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n" 
