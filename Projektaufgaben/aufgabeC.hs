@@ -26,17 +26,11 @@ instance Show State where
     show (InProgress cp op _) = "Current Player: " ++ show cp ++ "\nWaiting Player: " ++ show op ++ "\n"
     show (GameOver w) = "Player "++ name w ++ " has won the game.\n"
 
-toOrigin :: Player -> Player
-toOrigin (Player n o _ _ s) = Player n o Nothing 0 s
-
 move :: Player -> Int -> Player
 move (Player n o Nothing st s) d = Player n o (Just $ o + d - 1) (d - 1) s
-move p@(Player n o jl@(Just l) st s) d = Player n o (Just nl) (st + d) s
-    -- | d == 0 = p
-    -- | nl > l = Player n o (Just $ onField nl) (st + d) s
-    -- | otherwise = Player n o (Just $ onField nl) (st + d) s-- fieldSize - l + nl -- move passed fieldSize
-        where nl = onField $ l + d-- d = if nl > l then nl - l else fieldSize - l + nl
+move p@(Player n o jl@(Just l) st s) d = Player n o (Just . onField $ l + d) (st + d) s
 
+justLocation :: Player -> Int
 justLocation p = fromJust (location p)
 
 applyStrat :: State -> Strategy -> State
@@ -44,7 +38,9 @@ applyStrat :: State -> Strategy -> State
 applyStrat (InProgress cp op ii) strat = case strat of
     Nice -> InProgress op (move cp (onField (diff (justLocation cp) (justLocation op - 1)))) ii
     Bad -> InProgress (toOrigin op) (move cp (diff (justLocation cp) (justLocation op))) ii
-    where diff a b = if b > a then b - a else fieldSize - a + b
+    where 
+        diff a b = if b > a then b - a else fieldSize - a + b
+        toOrigin (Player n o _ _ s) = Player n o Nothing 0 s
 
 getStrat :: Player -> IO Strategy
 getStrat (Player _ _ _ _ (Just strat)) = return strat
