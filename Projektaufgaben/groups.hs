@@ -36,16 +36,16 @@ asSolution gs = Solution gs $ totalScore gs
 getNeighbours :: Solution -> [Solution]
 getNeighbours = pure
 
-improve :: Solution -> IO Solution
-improve s = do
+loalSearch :: Solution -> IO Solution
+loalSearch s = do
     print s
     let ns = getNeighbours s
     let best = foldl' (\b n -> if score n > score b then n else b) (head ns) (tail ns) -- This won't actually cause problems. Neighbours should never be empty.
-    if score best <= score s then return s else improve best
+    if score best <= score s then return s else loalSearch best
 
 main :: IO ()
 main = do 
     ls <- lines <$> readFile "wishes.txt"
     let gs = partitionGroups $ map (asPerson . words) ls
-    improve $ asSolution gs
+    loalSearch $ asSolution gs
     return ()
