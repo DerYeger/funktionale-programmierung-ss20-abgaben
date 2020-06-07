@@ -21,28 +21,23 @@ myRead name = do
     let groups = asGroups persons
     print persons
     print groups
-    print $ getScore $ groups !! 0
-    print $ getScore $ groups !! 1
-    print $ getScore $ groups !! 2
-    print $ getTotalScore groups
+    print $ totalScore groups
 
 asGroups :: Group -> [Group]
 asGroups = foldr partition [[], [], []]
     where partition x [xs, ys, zs] = [ys, zs, x:xs]
 
-getScore :: Group -> Int
-getScore group = foldl' calc 0 group
-    where 
-        containsWish n = foldl' (\acc x -> (name x == n) || acc) False group
-        calc :: Int -> Person -> Int
-        calc acc (Person _ f s t) = acc + checkWish f 10 + checkWish s 5 + checkWish t 1
+totalScore :: [Group] -> Int
+totalScore = foldl' (\acc g -> acc + groupScore g) 0
+    where groupScore group = foldl' calc 0 group
             where 
-                checkWish wish score = case wish of
-                    Nothing -> 0
-                    Just n -> if containsWish n then score else 0
-
-getTotalScore :: [Group] -> Int
-getTotalScore = foldl' (\acc g -> acc + getScore g) 0
+                containsWish n = foldl' (\acc x -> (name x == n) || acc) False group
+                calc :: Int -> Person -> Int
+                calc acc (Person _ f s t) = acc + checkWish f 10 + checkWish s 5 + checkWish t 1
+                    where 
+                        checkWish wish score = case wish of
+                            Nothing -> 0
+                            Just n -> if containsWish n then score else 0
 
 main :: IO ()
 main = myRead "wish.txt"
