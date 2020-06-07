@@ -1,38 +1,29 @@
-import Data.List.Split
+import Data.List.Split (chunksOf)
 
-data Person = Person{name::String, first::String, second::String, third::String} deriving (Eq)
+data Person = Person{name::String, first::Maybe String, second::Maybe String, third::Maybe String} deriving (Eq)
 instance Show Person where
     show (Person n f s t) = show n
 
+type Group = [Person]
+
 personify :: [String] -> Person
-personify (n:xs) = (Person n _ _ _)
-personify (n:f:xs) = (Person n f _ _)
-personify (n:f:s:xs) = (Person n f s _)
-personify (n:f:s:t:xs) = (Person n f s t)
+personify (n:f:s:t:_) = Person n (Just f) (Just s) (Just t)
+personify (n:f:s:_) = Person n (Just f) (Just s) Nothing
+personify (n:f:_) = Person n (Just f) Nothing Nothing
+personify (n:_) = Person n Nothing Nothing Nothing
 
-
-myRead :: String -> IO Int
+myRead :: String -> IO ()
 myRead name = do
     putStrLn name
     inhalt <- readFile name
-    let lineCount = length $ lines inhalt
-    let groupSize = (lineCount `div` 3) + 1
-    let myLines = lines inhalt
-    let participants = map words myLines
-    let firstGroup_x = map (splitOn " ") $ take groupSize myLines
-    --let firstGroup = map head firstGroup_x
-    let firstGroup = map personify firstGroup_x
-    let secondGroup_x = map (splitOn " ") $ take groupSize (drop groupSize myLines)
-    let secondGroup = map head secondGroup_x 
-    let thirdGroup_x = map (splitOn " ") $ take groupSize (drop (groupSize * 2) myLines) 
-    let thirdGroup = map head thirdGroup_x
-    print firstGroup
-    print secondGroup 
-    print thirdGroup
-    print firstGroup_x
-    print secondGroup_x 
-    print thirdGroup_x
-    return lineCount 
+    let persons = map (personify . words) (lines inhalt)
+    let groups = asGroups persons
+    print persons
+    print groups
 
-main :: IO Int
+asGroups :: Group -> [Group]
+asGroups = foldr partition [[], [], []]
+    where partition x [xs, ys, zs] = [ys, zs, x:xs]
+
+main :: IO ()
 main = myRead "wish.txt"
