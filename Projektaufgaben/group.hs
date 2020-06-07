@@ -31,7 +31,7 @@ totalScore :: [Group] -> Int
 totalScore = foldl' (\acc g -> acc + groupScore g) 0
     where groupScore group = foldl' calc 0 group
             where 
-                containsWish n = foldl' (\acc x -> (name x == n) || acc) False group
+                containsWish n = foldr (\x acc -> acc || (name x == n)) False group
                 calc :: Int -> Person -> Int
                 calc acc (Person _ f s t) = acc + checkWish f 10 + checkWish s 5 + checkWish t 1
                     where 
