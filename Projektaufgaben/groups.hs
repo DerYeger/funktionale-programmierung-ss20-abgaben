@@ -8,6 +8,9 @@ instance Show Person where
 
 type Group = [Person]
 
+wishScores :: [Int]
+wishScores = [10, 5, 1]
+
 asPerson :: [String] -> Person
 asPerson (n:xs) = Person n $ take 3 xs
 
@@ -26,10 +29,10 @@ asGroups = foldr partition [[], [], []]
 
 totalScore :: [Group] -> Int
 totalScore = foldl' (\acc g -> acc + groupScore g) 0
-    where groupScore group = foldl' personScore 0 group
+    where groupScore g = foldl' personScore 0 g
             where 
-                personScore acc (Person _ ws) = foldl' (+) acc $ zipWith checkWish ws [10, 5, 1]
-                checkWish w s = if foldr (\x acc -> acc || (name x == w)) False group then s else 0
+                personScore acc (Person _ ws) = foldl' (+) acc $ zipWith checkWish ws wishScores
+                checkWish w s = if foldr (\x acc -> acc || (name x == w)) False g then s else 0
 
 main :: IO ()
 main = optimizeGroups "wishes.txt"
