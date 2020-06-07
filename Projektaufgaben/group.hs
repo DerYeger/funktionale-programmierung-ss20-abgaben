@@ -1,5 +1,6 @@
 import Data.List.Split (chunksOf)
 import Data.List (foldl')
+import Data.Maybe (isJust, fromJust)
 
 data Person = Person{name::String, first::Maybe String, second::Maybe String, third::Maybe String} deriving (Eq)
 instance Show Person where
@@ -32,12 +33,8 @@ totalScore = foldl' (\acc g -> acc + groupScore g) 0
     where groupScore group = foldl' calc 0 group
             where 
                 containsWish n = foldr (\x acc -> acc || (name x == n)) False group
-                calc :: Int -> Person -> Int
                 calc acc (Person _ f s t) = acc + checkWish f 10 + checkWish s 5 + checkWish t 1
-                    where 
-                        checkWish wish score = case wish of
-                            Nothing -> 0
-                            Just n -> if containsWish n then score else 0
+                    where checkWish wish score = if isJust wish && (containsWish . fromJust $ wish) then score else 0
 
 main :: IO ()
 main = myRead "wish.txt"
