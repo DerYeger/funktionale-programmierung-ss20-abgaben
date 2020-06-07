@@ -2,17 +2,14 @@ import Data.List.Split (chunksOf)
 import Data.List (foldl')
 import Data.Maybe (isJust, fromJust)
 
-data Person = Person{name::String, first::Maybe String, second::Maybe String, third::Maybe String} deriving (Eq)
+data Person = Person{name::String, wishes::[String]} deriving (Eq)
 instance Show Person where
-    show (Person n f s t) = show n
+    show (Person n _) = show n
 
 type Group = [Person]
 
 personify :: [String] -> Person
-personify (n:f:s:t:_) = Person n (Just f) (Just s) (Just t)
-personify (n:f:s:_) = Person n (Just f) (Just s) Nothing
-personify (n:f:_) = Person n (Just f) Nothing Nothing
-personify (n:_) = Person n Nothing Nothing Nothing
+personify (n:xs) = Person n $ take 3 xs
 
 myRead :: String -> IO ()
 myRead name = do
@@ -32,9 +29,11 @@ totalScore :: [Group] -> Int
 totalScore = foldl' (\acc g -> acc + groupScore g) 0
     where groupScore group = foldl' calc 0 group
             where 
-                containsWish n = foldr (\x acc -> acc || (name x == n)) False group
-                calc acc (Person _ f s t) = acc + checkWish f 10 + checkWish s 5 + checkWish t 1
-                    where checkWish wish score = if isJust wish && (containsWish . fromJust $ wish) then score else 0
+                calc :: Int -> Person -> Int
+                calc acc (Person _ ws) = foldl' (+) acc $ zipWith checkWish ws [10, 5, 1]
+                    where 
+                        checkWish :: String -> Int -> Int
+                        checkWish wish score = if foldr (\x acc -> acc || (name x == wish)) False group then score else 0
 
 main :: IO ()
 main = myRead "wish.txt"
