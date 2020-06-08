@@ -35,7 +35,7 @@ asSolution gs = Solution gs $ totalScore gs
 
 -- TODO
 getNeighbours :: Solution -> [Solution]
-getNeighbours (Solution [xs, ys, zs] _) = map asSolution (addCombs zs xs (removeCombs ys))
+getNeighbours (Solution [xs, ys, zs] _) = map asSolution (addCombs xs ys zs)
 
 getMoveNeighbours :: Solution -> [Solution]
 getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
@@ -43,23 +43,21 @@ getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
     | length (gs !! 1) > length (head gs) = pure s -- 2 large and 1 small group TODO
     | otherwise = pure s -- 1 large and 2 small groups TODO
 
-loalSearch :: Solution -> IO Solution
-loalSearch s = do
+addCombs :: Group -> Group -> Group -> [[Group]]
+addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] (removeCombs s)
+    where removeCombs gs = foldl' rem [] gs
+            where rem acc p = (p, delete p gs):acc
+
+localSearch :: Solution -> IO Solution
+localSearch s = do
     print s
     let ns = getNeighbours s
     let best = foldl' (\b n -> if score n > score b then n else b) (head ns) (tail ns) -- This won't actually cause problems. Neighbours should never be empty.
-    if score best <= score s then return s else loalSearch best
+    if score best <= score s then return s else localSearch best
 
 main :: IO ()
 main = do 
     ls <- lines <$> readFile "wishes.txt"
     let gs = partitionGroups $ map (asPerson . words) ls
-    loalSearch $ asSolution gs
+    localSearch $ asSolution gs
     return ()
-
-removeCombs :: Group -> [(Person, Group)]
-removeCombs gs = foldl' rem [] gs
-    where rem acc p = (p, delete p gs):acc
-
-addCombs :: Group -> Group -> [(Person, Group)] -> [[Group]]
-addCombs d g = foldl' (\acc (p, ps) -> [p:g, ps, d]:acc) []
