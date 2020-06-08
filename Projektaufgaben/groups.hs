@@ -42,7 +42,7 @@ lokalSearch s = do
     print s
     let ns = getNeighbours s
     let best = foldl' (\b n -> if score n > score b then n else b) (head ns) (tail ns) -- This won't actually cause problems. Neighbours should never be empty.
-    if score best <= score s then return s else loalSearch best
+    if score best <= score s then return s else lokalSearch best
 
 main :: IO ()
 main = do 
