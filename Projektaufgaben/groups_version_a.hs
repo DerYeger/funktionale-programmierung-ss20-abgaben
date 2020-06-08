@@ -1,7 +1,7 @@
 module Groups where
 
-import Data.Function (on)
-import Data.List (delete, foldl', sortBy)
+import Data.List.Split (chunksOf)
+import Data.List (delete, foldl')
 import Data.Maybe (isJust, fromJust)
 
 data Person = Person {name::String, wishes::[String]} 
@@ -36,25 +36,24 @@ asSolution gs = Solution gs $ totalScore gs
 
 -- TODO
 -- important ! keep groups ordered by size
--- TODO move sorting to getMoveNeighbours, so we don't sort discarded solutions
 getNeighbours :: Solution -> [Solution]
-getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution $ getMoveNeighbours s ++ getSwapNeighbours s
+getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution (getMoveNeighbours s)
 
 getMoveNeighbours :: Solution -> [[Group]]
-getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
-    | length (head gs) == length (gs !! 2) = pure gs -- 3 equal groups
-    | length (gs !! 1) > length (head gs) = addCombs xs ys zs ++ addCombs xs zs ys -- 2 large and 1 small group
-    | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
-    where addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] (removeCombs s)
-            where removeCombs gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
-
-getSwapNeighbours :: Solution -> [[Group]]
-getSwapNeighbours (Solution gs@[xs, ys, zs] _) = sortBy (compare `on` length) $ swapAny xs ys zs ++ swapAny xs zs ys ++ swapAny ys zs xs -- get all possible swaps, then sort by length to restore order
-    where
-        swapAny first second neutral = foldl' (\acc p -> recombine p (delete p first) ++ acc) [] first -- get all possible swaps between the first and second group
-            where
-                recombine p ps = foldl' (\acc (u, us) -> [p:us, u:ps, neutral]:acc) [] secondRemoved -- combine this removal from the first group with every possible removal from the second group
-                secondRemoved = foldl' (\acc p -> (p, delete p second):acc) [] second -- get all possible removals from the second group
+getMoveNeighbours s@(Solution gs@[small, middle, large] _)
+    | length (head gs) == length (gs !! 2) = pure gs --swapOne small middle large ++ swapOne small large middle ++ swapOne middle large small
+    | length (gs !! 1) > length (head gs) = addCombs small middle large ++ addCombs small large middle -- 2 large and 1 small group
+    | otherwise = addCombs small large middle ++ addCombs middle large small -- 1 large and 2 small groups
+    where 
+        addCombs target source neutral = foldl' (\acc (p, ps) -> [ps, neutral, p:target]:acc) [] (removeCombs source)
+        --swapOne source_one source_two neutral = foldl' (\acc (removed_one, rest1, removed_two, rest2) -> [removed_two:rest1, removed_one:rest2, neutral]:acc) [] (removeTwo source_one source_two)
+        toSwap = (removeTwo g_one g_two) 
+        swapOne source_one source_two neutral = addSecond $ ((addFirst toSwap neutral) toSwap)
+            where 
+                removeCombs gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
+                removeTwo g_one g_two = foldl' (\acc p -> ((p, delete p g_one), removeCombs g_two): acc) [] g_one
+                addFirst gs n = foldl' (\acc (f, f_rest, _) -> [f_rest, n, f]:acc) [] gs
+                addSecond gs swapInfo =
 
 localSearch :: Solution -> IO Solution
 localSearch s = do
