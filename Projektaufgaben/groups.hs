@@ -1,10 +1,11 @@
 module Groups where
 
 import Data.List.Split (chunksOf)
-import Data.List (foldl')
+import Data.List (delete, foldl')
 import Data.Maybe (isJust, fromJust)
 
-data Person = Person {name::String, wishes::[String]}
+data Person = Person {name::String, wishes::[String]} 
+    deriving (Eq)
 instance Show Person where
     show (Person n _) = show n
 
@@ -34,7 +35,13 @@ asSolution gs = Solution gs $ totalScore gs
 
 -- TODO
 getNeighbours :: Solution -> [Solution]
-getNeighbours = pure
+getNeighbours (Solution [xs, ys, zs] _) = map asSolution (addCombs zs xs (removeCombs ys))
+
+getMoveNeighbours :: Solution -> [Solution]
+getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
+    | length (head gs) == length (gs !! 3) = pure s -- 3 large equals groups   
+    | length (gs !! 1) > length (head gs) = pure s -- 2 large and 1 small group TODO
+    | otherwise = pure s -- 1 large and 2 small groups TODO
 
 loalSearch :: Solution -> IO Solution
 loalSearch s = do
@@ -49,3 +56,10 @@ main = do
     let gs = partitionGroups $ map (asPerson . words) ls
     loalSearch $ asSolution gs
     return ()
+
+removeCombs :: Group -> [(Person, Group)]
+removeCombs gs = foldl' rem [] gs
+    where rem acc p = (p, delete p gs):acc
+
+addCombs :: Group -> Group -> [(Person, Group)] -> [[Group]]
+addCombs d g = foldl' (\acc (p, ps) -> [p:g, ps, d]:acc) []
