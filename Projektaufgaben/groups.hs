@@ -44,7 +44,7 @@ getMoveNeighbours s
     | length ys > length xs = addCombs xs ys zs ++ addCombs xs zs ys -- 2 large and 1 small group
     | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
     where 
-        gs@(xs:ys:zs:_) = sortBy (compare `on` length) $ groups s
+        gs@[xs, ys, zs] = sortBy (compare `on` length) $ groups s
         addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] (removeCombs s)
             where removeCombs gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
 
