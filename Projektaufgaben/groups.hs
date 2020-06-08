@@ -35,13 +35,13 @@ asSolution gs = Solution gs $ totalScore gs
 
 -- TODO
 getNeighbours :: Solution -> [Solution]
-getNeighbours (Solution [xs, ys, zs] _) = map asSolution (addCombs xs ys zs)
+getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution (getMoveNeighbours s)
 
-getMoveNeighbours :: Solution -> [Solution]
+getMoveNeighbours :: Solution -> [[Group]]
 getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
-    | length (head gs) == length (gs !! 3) = pure s -- 3 large equals groups   
-    | length (gs !! 1) > length (head gs) = pure s -- 2 large and 1 small group TODO
-    | otherwise = pure s -- 1 large and 2 small groups TODO
+    | length (head gs) == length (gs !! 2) = pure gs -- 3 large equals groups   
+    | length (gs !! 1) > length (head gs) = addCombs xs ys zs ++ addCombs xs zs ys-- 2 large and 1 small group TODO
+    | otherwise = pure gs -- 1 large and 2 small groups TODO
 
 addCombs :: Group -> Group -> Group -> [[Group]]
 addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] (removeCombs s)
