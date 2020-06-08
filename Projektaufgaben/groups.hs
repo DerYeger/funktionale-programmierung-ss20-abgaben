@@ -40,8 +40,8 @@ getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution (getMoveNeighbours s)
 
 getMoveNeighbours :: Solution -> [[Group]]
 getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
-    | length (head gs) == length (gs !! 2) = pure gs -- 3 large equals groups
-    | length (gs !! 1) > length (head gs) = addCombs xs ys zs ++ addCombs xs zs ys-- 2 large and 1 small group
+    | length (head gs) == length (gs !! 2) = pure gs -- 3 equal groups
+    | length (gs !! 1) > length (head gs) = addCombs xs ys zs ++ addCombs xs zs ys -- 2 large and 1 small group
     | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
     where addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] (removeCombs s)
             where removeCombs gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
