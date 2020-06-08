@@ -40,7 +40,7 @@ getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution $ getMoveNeighbours s
 
 getMoveNeighbours :: Solution -> [[Group]]
 getMoveNeighbours s
-    | length xs == length zs = pure gs -- 3 equal groups
+    | length xs == length zs = [] -- 3 equal groups
     | length ys > length xs = addCombs xs ys zs ++ addCombs xs zs ys -- 2 large and 1 small group
     | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
     where 
