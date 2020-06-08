@@ -49,8 +49,12 @@ getMoveNeighbours s
             where removeCombs gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
 
 getSwapNeighbours :: Solution -> [[Group]]
-getSwapNeighbours (Solution gs@[xs, ys, zs] _) = swapAny xs ys zs ++ swapAny xs zs ys ++ swapAny ys zs xs -- get all possible swaps, then sort by length to restore order
+getSwapNeighbours (Solution gs@[xs, ys, zs] _) = fs ++ ft ++ st ++ swapAgain fs ++ swapAgain ft ++ swapAgain st
     where
+        fs = swapAny xs ys zs
+        ft = swapAny xs zs ys
+        st = swapAny ys zs xs
+        swapAgain = concatMap (\ (f:(s:(n:_))) -> swapAny f s n)
         swapAny first second neutral = foldl' (\acc p -> recombine p (delete p first) ++ acc) [] first -- get all possible swaps between the first and second group
             where
                 recombine p ps = foldl' (\acc (u, us) -> [p:us, u:ps, neutral]:acc) [] secondRemoved -- combine this removal from the first group with every possible removal from the second group
