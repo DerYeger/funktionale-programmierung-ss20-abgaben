@@ -1,7 +1,7 @@
 module Groups where
 
-import Data.List.Split (chunksOf)
-import Data.List (delete, foldl')
+import Data.Function (on)
+import Data.List (delete, foldl', sortBy)
 import Data.Maybe (isJust, fromJust)
 
 data Person = Person {name::String, wishes::[String]} 
@@ -36,8 +36,9 @@ asSolution gs = Solution gs $ totalScore gs
 
 -- TODO
 -- important ! keep groups ordered by size
+-- TODO move sorting to getMoveNeighbours, so we don't sort discarded solutions
 getNeighbours :: Solution -> [Solution]
-getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution (getMoveNeighbours s)
+getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution $ getMoveNeighbours s ++ getSwapNeighbours s
 
 getMoveNeighbours :: Solution -> [[Group]]
 getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
@@ -46,6 +47,14 @@ getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
     | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
     where addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] (removeCombs s)
             where removeCombs gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
+
+getSwapNeighbours :: Solution -> [[Group]]
+getSwapNeighbours (Solution gs@[xs, ys, zs] _) = sortBy (compare `on` length) $ swapAny xs ys zs ++ swapAny xs zs ys ++ swapAny ys zs xs -- get all possible swaps, then sort by length to restore order
+    where
+        swapAny first second neutral = foldl' (\acc p -> recombine p (delete p first) ++ acc) [] first -- get all possible swaps between the first and second group
+            where
+                recombine p ps = foldl' (\acc (u, us) -> [p:us, u:ps, neutral]:acc) [] secondRemoved -- combine this removal from the first group with every possible removal from the second group
+                secondRemoved = foldl' (\acc p -> (p, delete p second):acc) [] second -- get all possible removals from the second group
 
 localSearch :: Solution -> IO Solution
 localSearch s = do
