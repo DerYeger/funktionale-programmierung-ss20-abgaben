@@ -9,6 +9,7 @@ instance Show Person where
     show (Person n _) = show n
 
 type Group = [Person]
+
 data Solution = Solution {groups::[Group], score::Int}
     deriving (Show)
 
@@ -36,8 +37,8 @@ asSolution gs = Solution gs $ totalScore gs
 getNeighbours :: Solution -> [Solution]
 getNeighbours = pure
 
-loalSearch :: Solution -> IO Solution
-loalSearch s = do
+lokalSearch :: Solution -> IO Solution
+lokalSearch s = do
     print s
     let ns = getNeighbours s
     let best = foldl' (\b n -> if score n > score b then n else b) (head ns) (tail ns) -- This won't actually cause problems. Neighbours should never be empty.
