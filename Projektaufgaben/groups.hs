@@ -48,5 +48,5 @@ main :: IO ()
 main = do 
     ls <- lines <$> readFile "wishes.txt"
     let gs = partitionGroups $ map (asPerson . words) ls
-    loalSearch $ asSolution gs
+    lokalSearch $ asSolution gs
     return ()
