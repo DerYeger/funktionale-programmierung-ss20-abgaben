@@ -39,8 +39,8 @@ getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution (getMoveNeighbours s)
 
 getMoveNeighbours :: Solution -> [[Group]]
 getMoveNeighbours s@(Solution gs@[xs, ys, zs] _)
-    | length (head gs) == length (gs !! 2) = pure gs -- 3 large equals groups   
-    | length (gs !! 1) > length (head gs) = addCombs xs ys zs ++ addCombs xs zs ys-- 2 large and 1 small group TODO
+    | length (head gs) == length (gs !! 2) = pure gs -- 3 large equals groups
+    | length (gs !! 1) > length (head gs) = addCombs xs ys zs ++ addCombs xs zs ys-- 2 large and 1 small group
     | otherwise = pure gs -- 1 large and 2 small groups TODO
 
 addCombs :: Group -> Group -> Group -> [[Group]]
