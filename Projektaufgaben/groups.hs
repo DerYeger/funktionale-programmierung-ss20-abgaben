@@ -1,7 +1,6 @@
 module Groups where
 
 import Data.List (delete, foldl', maximumBy, sortOn)
-import Data.Maybe (isJust, fromJust)
 import Data.Ord (comparing)
 
 data Person = Person {name::String, wishes::[String]} 
