@@ -33,6 +33,9 @@ totalScore = foldl' (\acc g -> acc + groupScore g) 0
 asSolution :: [Group] -> Solution
 asSolution gs = Solution gs $ totalScore gs
 
+removeSinglePerson :: Group -> [(Person, Group)]
+removeSinglePerson gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
+
 getNeighbours :: Solution -> [Solution]
 getNeighbours s = map asSolution $ getMoveNeighbours s ++ getSwapNeighbours s
 
@@ -43,8 +46,7 @@ getMoveNeighbours s
     | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
     where 
         gs@[xs, ys, zs] = sortOn length $ groups s
-        addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] (removeCombs s)
-            where removeCombs gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
+        addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] $ removeSinglePerson s
 
 -- TODO improve swapAgain
 getSwapNeighbours :: Solution -> [[Group]]
@@ -53,11 +55,11 @@ getSwapNeighbours (Solution gs@[xs, ys, zs] _) = fs ++ ft ++ st ++ swapAgain fs 
         fs = swapAny xs ys zs
         ft = swapAny xs zs ys
         st = swapAny ys zs xs
-        swapAgain = concatMap (\ (f:(s:(n:_))) -> swapAny f s n)
+        swapAgain = concatMap (\(f:(s:(n:_))) -> swapAny f s n)
         swapAny first second neutral = foldl' (\acc p -> recombine p (delete p first) ++ acc) [] first -- get all possible swaps between the first and second group
             where
                 recombine p ps = foldl' (\acc (u, us) -> [p:us, u:ps, neutral]:acc) [] secondRemoved -- combine this removal from the first group with every possible removal from the second group
-                secondRemoved = foldl' (\acc p -> (p, delete p second):acc) [] second -- get all possible removals from the second group
+                secondRemoved = removeSinglePerson second -- get all possible removals from the second group
 
 localSearch :: Solution -> IO Solution
 localSearch s = do
