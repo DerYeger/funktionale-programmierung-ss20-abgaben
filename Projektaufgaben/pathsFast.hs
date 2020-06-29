@@ -35,11 +35,12 @@ pathsFast n m ys xs yt xt z1 z2 z3 = map reverse $ paths [[Step ys xs sVal sVal]
             | null ps = []
             | length (head ps) == n * m = ps
             | otherwise = paths $ concatMap nextSteps ps
-        nextSteps steps@((Step y x _ score):_) = addIfValid (move (y-1) x div) . addIfValid (move y (x-1) (-)) . addIfValid (move (y+1) x (*)) . addIfValid (move y (x+1) (+)) $ []
+        nextSteps steps@((Step y x _ cScore):_) = foldl' validStep [] [(-1, 0, div), (0, -1, (-)), (1, 0, (*)), (0, 1, (+))]
             where
-                move ny nx op = Step ny nx nVal (score `op` nVal)
-                    where nVal = (arr !! ny) !! nx
-                addIfValid ns@(Step y x _ nscore) ps = if isInRange && nscore >= 0 && noPrematureEnd && ns `notElem` steps then (ns : steps) : ps else ps
-                    where 
-                        isInRange = 0 <= y && y < n && 0 <= x && x < m
-                        noPrematureEnd = y /= yt || x /= xt || length steps == n * m - 1
+                validStep acc (yd, xd, op) = if isInRange && noPrematureEnd && score step >= 0 && step `notElem` steps then (step:steps):acc else acc
+                    where
+                        ny = y + yd; nx = x + xd
+                        isInRange = 0 <= ny && ny < n && 0 <= nx && nx < m
+                        noPrematureEnd = ny /= yt || nx /= xt || length steps == n * m - 1
+                        step = Step ny nx nVal (cScore `op` nVal) 
+                            where nVal = (arr !! ny) !! nx
