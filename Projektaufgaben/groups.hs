@@ -1,8 +1,8 @@
 module Groups where
 
-import Data.Function (on)
-import Data.List (delete, foldl', sortBy)
+import Data.List (delete, foldl', maximumBy, sortOn)
 import Data.Maybe (isJust, fromJust)
+import Data.Ord (comparing)
 
 data Person = Person {name::String, wishes::[String]} 
     deriving (Eq)
@@ -34,9 +34,8 @@ totalScore = foldl' (\acc g -> acc + groupScore g) 0
 asSolution :: [Group] -> Solution
 asSolution gs = Solution gs $ totalScore gs
 
--- TODO
 getNeighbours :: Solution -> [Solution]
-getNeighbours s@(Solution [xs, ys, zs] _) = map asSolution $ getMoveNeighbours s ++ getSwapNeighbours s
+getNeighbours s = map asSolution $ getMoveNeighbours s ++ getSwapNeighbours s
 
 getMoveNeighbours :: Solution -> [[Group]]
 getMoveNeighbours s
@@ -44,10 +43,11 @@ getMoveNeighbours s
     | length ys > length xs = addCombs xs ys zs ++ addCombs xs zs ys -- 2 large and 1 small group
     | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
     where 
-        gs@[xs, ys, zs] = sortBy (compare `on` length) $ groups s
+        gs@[xs, ys, zs] = sortOn length $ groups s
         addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] (removeCombs s)
             where removeCombs gs = foldl' (\acc p -> (p, delete p gs):acc) [] gs
 
+-- TODO improve swapAgain
 getSwapNeighbours :: Solution -> [[Group]]
 getSwapNeighbours (Solution gs@[xs, ys, zs] _) = fs ++ ft ++ st ++ swapAgain fs ++ swapAgain ft ++ swapAgain st
     where
@@ -64,12 +64,12 @@ localSearch :: Solution -> IO Solution
 localSearch s = do
     print s
     let ns = getNeighbours s
-    let best = foldl' (\b n -> if score n > score b then n else b) (head ns) (tail ns) -- This won't actually cause problems. Neighbours should never be empty.
+    let best = maximumBy (comparing score) ns
     if score best <= score s then return s else localSearch best
 
 main :: IO ()
 main = do 
-    ls <- lines <$> readFile "wishes.txt"
+    ls <- lines <$> readFile "wishes2.txt"
     let gs = partitionGroups $ map (asPerson . words) ls
     localSearch $ asSolution gs
     return ()
