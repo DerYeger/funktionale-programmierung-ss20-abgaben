@@ -1,3 +1,5 @@
+-- Compilation: ghc -main-is Groups groups.hs 
+
 module Groups where
 
 import Data.List (delete, foldl', maximumBy, sortOn)
