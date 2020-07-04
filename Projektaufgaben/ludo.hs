@@ -59,7 +59,7 @@ turn s@(InProgress ii cp op) = do
     printTurn s d
     if isOnField cp && isOnField op && onField (d + justLocation cp) == justLocation op
         then applyStrat s d <$> getStrat cp -- new location is same field as opponent
-        else return $ InProgress ii op (move cp d) -- just move
+        else return $! InProgress ii op (move cp d) -- just move. return strictly, because the result will be inspected anyway
 
 checkGameOver :: State -> State
 checkGameOver s@(GameOver _) = s
@@ -79,7 +79,7 @@ playRounds rc start =
         else do
             (aw, bw) <- playRounds (rc - 1) start
             w <- winner <$> playRound start
-            if name w == name (currentPlayer start) then return (aw + 1, bw) else return (aw, bw + 1)
+            if name w == name (currentPlayer start) then return $! (aw + 1, bw) else return $! (aw, bw + 1) -- increment strictly to prevent long chains of additions
 
 ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
