@@ -48,7 +48,6 @@ getMoveNeighbours s
         gs@[xs, ys, zs] = sortOn length $ groups s
         addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] $ removeSinglePerson s
 
--- TODO improve swapAgain
 getSwapNeighbours :: Solution -> [[Group]]
 getSwapNeighbours (Solution gs@[xs, ys, zs] _) = fs ++ ft ++ st ++ swapAgain fs ++ swapAgain ft ++ swapAgain st
     where
