@@ -33,7 +33,7 @@ pathsShort n m ys xs yt xt z1 z2 z3 = map reverse paths
         sVal = (arr !! ys) !! xs
         arr = buildArray n m z1 z2 z3
         paths = iterate (concatMap nextSteps) [[Step ys xs sVal sVal]] !! (n * m - 1)
-        nextSteps steps@((Step y x _ cScore):_) = foldl' validStep [] [(-1, 0, div), (0, -1, (-)), (1, 0, (*)), (0, 1, (+))]
+        nextSteps steps@(Step y x _ cScore : _) = foldl' validStep [] [(-1, 0, div), (0, -1, (-)), (1, 0, (*)), (0, 1, (+))]
             where
                 validStep acc (yd, xd, op) = if isInRange && noPrematureEnd && score step >= 0 && step `notElem` steps then (step:steps):acc else acc
                     where 
