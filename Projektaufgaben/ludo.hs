@@ -2,6 +2,8 @@
 -- Compilation: stack ghc ludo.hs 
 -- Execution (Windows): ludo.exe [statisticRoundCount]
 -- GHCi: stack ghci ludo.hs
+    -- Usage: ludoInteractive OR ludoStatistic roundCount
+    -- ludoStatistic 1000
 
 import Control.Monad (when, void)
 import Data.Maybe (fromJust)
