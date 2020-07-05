@@ -1,9 +1,13 @@
--- Compilation: ghc -main-is Groups groups.hs 
+-- Compilation: ghc -main-is Groups groups.hs
+-- Execution: groups wishes.txt
+-- GHCi: stack ghci groups.hs
+    -- Usage: evaluateGroups "wishes.txt"
 
 module Groups where
 
 import Data.List (delete, foldl', maximumBy, sortOn)
 import Data.Ord (comparing)
+import System.Environment (getArgs)
 
 data Person = Person {name::String, wishes::[String]} 
     deriving (Eq)
@@ -69,9 +73,12 @@ localSearch s = do
     let best = maximumBy (comparing score) ns
     if score best <= score s then return s else localSearch best
 
-main :: IO ()
-main = do 
-    ls <- lines <$> readFile "wishes2.txt"
-    let gs = partitionGroups $ map (asPerson . words) ls
+evaluateGroups :: String -> IO ()
+evaluateGroups fileName = do
+    fileContents <- readFile fileName
+    let gs = partitionGroups $ map (asPerson . words) $ lines fileContents
     localSearch $ asSolution gs
     return ()
+
+main :: IO ()
+main = getArgs >>= evaluateGroups . head
