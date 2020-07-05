@@ -36,9 +36,6 @@ move :: Player -> Int -> Player
 move (Player n o s Nothing st) d = Player n o s (Just $ o + d - 1) $ d - 1
 move (Player n o s (Just l) st) d = Player n o s (Just . onField $ l + d) $ st + d
 
-justLocation :: Player -> Int
-justLocation p = fromJust $ location p
-
 applyStrat :: State -> Int -> Strategy -> State
 applyStrat (InProgress ii cp op) d strat = case strat of
     Nice -> InProgress ii op $ move cp $ d - 1
@@ -53,31 +50,30 @@ getStrat _ = do
     putStr "\n"
     if s == "Bad" then return Bad else return Nice
 
-isOnField :: Player -> Bool
-isOnField p = case location p of 
-    Nothing -> False
-    _ -> True
-
 turn :: State -> IO State
 turn s@(GameOver _) = return s
 turn s@(InProgress ii cp op) = do
     d <- randomRIO (1, 6)
-    printTurn s d
+    when ii $ printTurn s d
     if isOnField cp && isOnField op && onField (d + justLocation cp) == justLocation op
         then applyStrat s d <$> getStrat cp -- new location is same field as opponent
         else return $! InProgress ii op (move cp d) -- just move. return strictly, because the result will be inspected anyway
-    where printTurn s@(InProgress ii cp _) d = when ii . putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n"
-
-checkGameOver :: State -> State
-checkGameOver s@(GameOver _) = s
-checkGameOver s@(InProgress _ _ p)
-    | stepsTaken p < fieldSize = s
-    | otherwise = GameOver p
+    where
+        isOnField p = case location p of 
+            Nothing -> False
+            _ -> True
+        justLocation p = fromJust $ location p
+        printTurn s@(InProgress _ cp _) d = putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n"
 
 playRound :: State -> IO State
 playRound s = checkGameOver <$> turn s >>= \ns -> case ns of
     GameOver{} -> return ns -- game is over 
     InProgress{} -> playRound ns -- continue with next turn
+    where 
+        checkGameOver s@(GameOver _) = s
+        checkGameOver s@(InProgress _ _ p)
+            | stepsTaken p < fieldSize = s
+            | otherwise = GameOver p
 
 playRounds :: Int -> State -> IO (Int, Int)
 playRounds rc start =
