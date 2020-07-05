@@ -1,8 +1,12 @@
-module AufgabeC (ludoInteractive, ludoStatistic) where 
+-- Requires System.Random to be installed
+-- Compilation: stack ghc ludo.hs 
+-- Execution (Windows): ludo.exe [statisticRoundCount]
+-- GHCi: stack ghci ludo.hs
 
-import System.Random (randomRIO)
+import Control.Monad (when, void)
 import Data.Maybe (fromJust)
-import Control.Monad (when)
+import System.Environment (getArgs)
+import System.Random (randomRIO)
 
 fieldSize :: Int
 fieldSize = 24
@@ -60,6 +64,7 @@ turn s@(InProgress ii cp op) = do
     if isOnField cp && isOnField op && onField (d + justLocation cp) == justLocation op
         then applyStrat s d <$> getStrat cp -- new location is same field as opponent
         else return $! InProgress ii op (move cp d) -- just move. return strictly, because the result will be inspected anyway
+    where printTurn s@(InProgress ii cp _) d = when ii . putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n"
 
 checkGameOver :: State -> State
 checkGameOver s@(GameOver _) = s
@@ -81,18 +86,21 @@ playRounds rc start =
             w <- winner <$> playRound start
             if name w == name (currentPlayer start) then return $! (aw + 1, bw) else return $! (aw, bw + 1) -- increment strictly to prevent long chains of additions
 
+ludoInteractive :: IO ()
+ludoInteractive = playRound (InProgress True (Player "A" 1 Nothing Nothing 0) (Player "B" 8 (Just Bad) Nothing 0)) >>= print
+
 ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
     let playerA = Player "A" 1 (Just Bad) Nothing 0 
     let playerB = Player "B" 8 (Just Nice) Nothing 0 
-    let printWins p w = putStr $ name p ++ " has won " ++ show w ++ " round(s) using the " ++ (show . fromJust . strat $ p) ++ " strategy.\n"
     (aw, bw) <- playRounds rc (InProgress False playerA playerB)
     printWins playerA aw
-    printWins playerB bw 
+    printWins playerB bw
+        where printWins p w = putStr $ name p ++ " has won " ++ show w ++ " round(s) using the " ++ (show . fromJust . strat $ p) ++ " strategy.\n"
 
-ludoInteractive :: IO State
-ludoInteractive = playRound $ InProgress True (Player "A" 1 Nothing Nothing 0) (Player "B" 8 (Just Bad) Nothing 0)
-
-printTurn :: State -> Int -> IO ()
-printTurn s@(InProgress ii cp _) d = 
-    when ii . putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n" 
+main :: IO ()
+main = do
+    args <- getArgs
+    if null args
+        then ludoInteractive
+        else ludoStatistic (read (head args) :: Int)
