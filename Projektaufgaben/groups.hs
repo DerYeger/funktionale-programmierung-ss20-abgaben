@@ -33,7 +33,7 @@ totalScore = foldl' (\acc g -> acc + groupScore g) 0
     where groupScore g = foldl' personScore 0 g
             where 
                 personScore acc (Person _ ws) = foldl' (+) acc $ zipWith checkWish ws wishScores
-                checkWish w s = if foldr (\x acc -> acc || (name x == w)) False g then s else 0
+                checkWish w s = if foldr (\x acc -> name x == w || acc) False g then s else 0
 
 asSolution :: [Group] -> Solution
 asSolution gs = Solution gs $ totalScore gs
