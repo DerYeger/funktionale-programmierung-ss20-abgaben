@@ -5,6 +5,7 @@
 
 module Groups where
 
+import Control.Monad (void)
 import Data.List (delete, foldl', maximumBy, sortOn)
 import Data.Ord (comparing)
 import System.Environment (getArgs)
@@ -71,10 +72,7 @@ localSearch s = do
     if score best <= score s then return s else localSearch best
 
 optimizeGroups :: String -> IO ()
-optimizeGroups fileName = do
-    initialSolution <- asSolution . partitionGroups . map (asPerson . words) <$> (lines <$> readFile fileName)
-    result <- localSearch initialSolution
-    return ()
+optimizeGroups fileName = void . localSearch =<< asSolution . partitionGroups . map (asPerson . words) <$> (lines <$> readFile fileName)
 
 main :: IO ()
 main = getArgs >>= optimizeGroups . head
