@@ -26,7 +26,6 @@ data Player = Player {name::String, origin::Int, strat::Maybe Strategy, location
 instance Show Player where
     show (Player n _ _ l st) = n ++ " is on " ++ show l ++ " and has " ++ show (fieldSize - st)++ " steps left."
 
-
 data State = InProgress {isInteractive::Bool, currentPlayer::Player, otherPlayer::Player} | GameOver {winner::Player}
 instance Show State where
     show (InProgress _ cp op) = "Current Player: " ++ show cp ++ "\nWaiting Player: " ++ show op ++ "\n"
