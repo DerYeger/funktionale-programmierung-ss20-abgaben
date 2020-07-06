@@ -1,7 +1,5 @@
 -- Compilation: ghc -main-is Groups groups.hs
 -- Execution: groups wishes.txt
--- GHCi: stack ghci groups.hs
-    -- Usage: optimizeGroups "wishes.txt"
 
 module Groups where
 
@@ -71,8 +69,6 @@ localSearch s = do
     let best = maximumBy (comparing score) $ getNeighbours s
     if score best <= score s then return s else localSearch best
 
-optimizeGroups :: String -> IO ()
-optimizeGroups fileName = void . localSearch =<< asSolution . partitionGroups . map (asPerson . words) <$> lines <$> readFile fileName
-
 main :: IO ()
-main = optimizeGroups . head =<< getArgs
+main = void . localSearch =<< parseFile . head =<< getArgs
+    where parseFile path = asSolution . partitionGroups . map (asPerson . words) . lines <$> readFile path
