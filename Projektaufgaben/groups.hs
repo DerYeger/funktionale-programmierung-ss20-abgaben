@@ -25,8 +25,8 @@ asPerson :: [String] -> Person
 asPerson (n:xs) = Person n $ take 3 xs
 
 partitionGroups :: Group -> [Group]
-partitionGroups = foldr partition [[], [], []]
-    where partition x [xs, ys, zs] = [ys, zs, x:xs]
+partitionGroups = foldl' partition [[], [], []]
+    where partition [xs, ys, zs] x = [ys, zs, x:xs]
 
 totalScore :: [Group] -> Int
 totalScore = foldl' (\acc g -> acc + groupScore g) 0
