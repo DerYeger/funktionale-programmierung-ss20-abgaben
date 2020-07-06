@@ -72,7 +72,7 @@ localSearch s = do
     if score best <= score s then return s else localSearch best
 
 optimizeGroups :: String -> IO ()
-optimizeGroups fileName = void . localSearch =<< asSolution . partitionGroups . map (asPerson . words) <$> (lines <$> readFile fileName)
+optimizeGroups fileName = void . localSearch =<< asSolution . partitionGroups . map (asPerson . words) <$> lines <$> readFile fileName
 
 main :: IO ()
 main = optimizeGroups . head =<< getArgs
