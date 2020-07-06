@@ -50,11 +50,11 @@ getMoveNeighbours s
     | length ys > length xs = addCombs xs ys zs ++ addCombs xs zs ys -- 2 large and 1 small group
     | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
     where 
-        gs@[xs, ys, zs] = sortOn length $ groups s
+        [xs, ys, zs] = sortOn length $ groups s
         addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] $ removeSinglePerson s
 
 getSwapNeighbours :: Solution -> [[Group]]
-getSwapNeighbours (Solution gs@[xs, ys, zs] _) = allSwaps xs ys zs ++ allSwaps xs zs ys ++ allSwaps ys zs xs
+getSwapNeighbours (Solution [xs, ys, zs] _) = allSwaps xs ys zs ++ allSwaps xs zs ys ++ allSwaps ys zs xs
     where
         allSwaps first second neutral = singleSwapped ++ concatMap (\(f:(s:(n:_))) -> swapSingle f s n) singleSwapped
             where singleSwapped = swapSingle first second neutral
