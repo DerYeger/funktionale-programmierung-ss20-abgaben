@@ -75,4 +75,4 @@ optimizeGroups :: String -> IO ()
 optimizeGroups fileName = void . localSearch =<< asSolution . partitionGroups . map (asPerson . words) <$> (lines <$> readFile fileName)
 
 main :: IO ()
-main = getArgs >>= optimizeGroups . head
+main = optimizeGroups . head =<< getArgs

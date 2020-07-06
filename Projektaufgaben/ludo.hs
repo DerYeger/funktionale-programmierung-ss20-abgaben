@@ -85,7 +85,7 @@ playRounds rc start =
             if name w == name (currentPlayer start) then return $! (aw + 1, bw) else return $! (aw, bw + 1) -- increment strictly to prevent long chains of additions
 
 ludoInteractive :: IO ()
-ludoInteractive = playRound (InProgress True (Player "A" 1 Nothing Nothing 0) (Player "B" 8 (Just Bad) Nothing 0)) >>= print
+ludoInteractive = print =<< playRound (InProgress True (Player "A" 1 Nothing Nothing 0) (Player "B" 8 (Just Bad) Nothing 0))
 
 ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
