@@ -80,8 +80,8 @@ playRounds s = (!!) $ iterate (creditWinner $ playRound s) $ pure (0, 0)
     where creditWinner r sc = do
             w <- winner <$> r
             (aw, bw) <- sc
-            let nsc = if name w == name (currentPlayer s) then (aw + 1, bw) else (aw, bw + 1) -- increment strictly to prevent long chains of additions
-            return $ force nsc
+            let nsc = if name w == name (currentPlayer s) then (aw + 1, bw) else (aw, bw + 1)
+            return $! force nsc -- force evaluation to prevent long chains of additions
 
 ludoInteractive :: IO ()
 ludoInteractive = print =<< playRound (InProgress True (Player "A" 1 Nothing Nothing 0) $ Player "B" 8 (Just Bad) Nothing 0)
