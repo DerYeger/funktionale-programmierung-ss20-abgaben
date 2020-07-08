@@ -64,10 +64,8 @@ getSwapNeighbours (Solution [xs, ys, zs] _) = allSwaps xs ys zs ++ allSwaps xs z
                 secondRemoved = removeSinglePerson second -- get all possible removals from the second group
 
 localSearch :: Solution -> IO Solution
-localSearch s = do
-    print s
-    let best = maximumBy (comparing score) $ getNeighbours s
-    if score best <= score s then return s else localSearch best
+localSearch s = let best = maximumBy (comparing score) $ getNeighbours s
+    in print s >> if score best <= score s then return s else localSearch best
 
 main :: IO ()
 main = void . localSearch =<< parseFile . head =<< getArgs
