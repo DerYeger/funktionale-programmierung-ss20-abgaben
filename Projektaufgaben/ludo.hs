@@ -8,7 +8,7 @@
 import Control.Exception (evaluate)
 import Control.DeepSeq (force)
 import Control.Monad (when, void)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, isJust)
 import System.Environment (getArgs)
 import System.Random (randomRIO)
 
@@ -56,14 +56,11 @@ turn s@(GameOver _) = return s
 turn s@(InProgress ii cp op) = do
     d <- randomRIO (1, 6)
     when ii $ printTurn d
-    if isOnField cp && isOnField op && onField (d + justLocation cp) == justLocation op
+    if onSameField d
         then applyStrat s d <$> getStrat cp -- new location is same field as opponent
         else return $! InProgress ii op (move cp d) -- just move. return strictly, because the result will be inspected anyway
     where
-        isOnField p = case location p of 
-            Nothing -> False
-            _ -> True
-        justLocation p = fromJust $ location p
+        onSameField d = isJust (location cp) && (location op == Just (onField (d + fromJust (location cp))))
         printTurn d = putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n"
 
 playRound :: State -> IO State
