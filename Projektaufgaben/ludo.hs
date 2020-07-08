@@ -67,14 +67,7 @@ turn s@(InProgress ii cp op) = do
         printTurn d = putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n"
 
 playRound :: State -> IO State
-playRound s = checkGameOver <$> turn s >>= \ns -> case ns of
-    GameOver{} -> return ns -- game is over 
-    InProgress{} -> playRound ns -- continue with next turn
-    where 
-        checkGameOver s@(GameOver _) = s
-        checkGameOver s@(InProgress _ _ p)
-            | stepsTaken p < fieldSize = s
-            | otherwise = GameOver p
+playRound s = (\ns@(InProgress _ _ p) -> if stepsTaken p < fieldSize then playRound ns else return $ GameOver p) =<< turn s
 
 playRounds :: State -> Int -> IO (Int, Int)
 playRounds s = (!!) $ iterate (creditWinner $ playRound s) $ pure (0, 0)   
