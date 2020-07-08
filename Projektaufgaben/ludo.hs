@@ -60,7 +60,7 @@ turn s@(InProgress ii cp op) = do
         then applyStrat s d <$> getStrat cp -- new location is same field as opponent
         else return $! InProgress ii op (move cp d) -- just move. return strictly, because the result will be inspected anyway
     where
-        onSameField d = isJust (location cp) && (location op == Just (onField (d + fromJust (location cp))))
+        onSameField d = isJust (location cp) && location op == Just (onField $ d + fromJust (location cp))
         printTurn d = putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n"
 
 playRound :: State -> IO State
