@@ -75,13 +75,11 @@ playRound s = checkGameOver <$> turn s >>= \ns -> case ns of
             | otherwise = GameOver p
 
 playRounds :: Int -> State -> IO (Int, Int)
-playRounds rc start =
-    if rc <= 0 
-        then return (0,0) 
-        else do
-            (aw, bw) <- playRounds (rc - 1) start
+playRounds rc start = iterate (creditWinner $ playRound start) (pure (0, 0)) !! rc      
+    where creditWinner result scores = do
             w <- winner <$> playRound start
-            if name w == name (currentPlayer start) then return $! (aw + 1, bw) else return $! (aw, bw + 1) -- increment strictly to prevent long chains of additions
+            (aw, bw) <- scores
+            if name w == name (currentPlayer start) then return ((+) 1 $! aw, bw) else return (aw, (+) 1 $! bw) -- increment strictly to prevent long chains of additions
 
 ludoInteractive :: IO ()
 ludoInteractive = print =<< playRound (InProgress True (Player "A" 1 Nothing Nothing 0) (Player "B" 8 (Just Bad) Nothing 0))
