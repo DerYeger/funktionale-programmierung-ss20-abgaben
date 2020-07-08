@@ -74,10 +74,10 @@ playRound s = checkGameOver <$> turn s >>= \ns -> case ns of
             | stepsTaken p < fieldSize = s
             | otherwise = GameOver p
 
-playRounds :: Int -> State -> IO (Int, Int)
-playRounds rc start = iterate (creditWinner $ playRound start) (pure (0, 0)) !! rc      
+playRounds :: State -> Int -> IO (Int, Int)
+playRounds start = (!!) $ iterate (creditWinner $ playRound start) (pure (0, 0))   
     where creditWinner result scores = do
-            w <- winner <$> playRound start
+            w <- winner <$> result
             (aw, bw) <- scores
             if name w == name (currentPlayer start) then return ((+) 1 $! aw, bw) else return (aw, (+) 1 $! bw) -- increment strictly to prevent long chains of additions
 
@@ -88,7 +88,7 @@ ludoStatistic :: Int -> IO ()
 ludoStatistic rc = do
     let playerA = Player "A" 1 (Just Bad) Nothing 0 
     let playerB = Player "B" 8 (Just Nice) Nothing 0 
-    (aw, bw) <- playRounds rc (InProgress False playerA playerB)
+    (aw, bw) <- playRounds (InProgress False playerA playerB) rc
     printWins playerA aw
     printWins playerB bw
         where printWins p w = putStr $ name p ++ " has won " ++ show w ++ " round(s) using the " ++ (show . fromJust . strat $ p) ++ " strategy.\n"
