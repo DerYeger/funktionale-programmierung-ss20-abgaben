@@ -47,18 +47,18 @@ getNeighbours s = map asSolution $ getMoveNeighbours s ++ getSwapNeighbours s
 getMoveNeighbours :: Solution -> [[Group]]
 getMoveNeighbours s
     | length xs == length zs = [] -- 3 equal groups
-    | length ys > length xs = addCombs xs ys zs ++ addCombs xs zs ys -- 2 large and 1 small group
-    | otherwise = addCombs xs zs ys ++ addCombs ys zs xs -- 1 large and 2 small groups
+    | length ys > length xs = movePerson xs ys zs ++ movePerson xs zs ys -- 2 large and 1 small group
+    | otherwise = movePerson xs zs ys ++ movePerson ys zs xs -- 1 large and 2 small groups
     where 
         [xs, ys, zs] = sortOn length $ groups s
-        addCombs t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] $ removeSinglePerson s
+        movePerson t s n = foldl' (\acc (p, ps) -> [ps, n, p:t]:acc) [] $ removeSinglePerson s
 
 getSwapNeighbours :: Solution -> [[Group]]
 getSwapNeighbours (Solution [xs, ys, zs] _) = allSwaps xs ys zs ++ allSwaps xs zs ys ++ allSwaps ys zs xs
     where
-        allSwaps first second neutral = singleSwapped ++ concatMap (\(f:(s:(n:_))) -> swapSingle f s n) singleSwapped
-            where singleSwapped = swapSingle first second neutral
-        swapSingle first second neutral = foldl' (\acc p -> recombine p (delete p first) ++ acc) [] first -- get all possible swaps between the first and second group
+        allSwaps first second neutral = singleSwapped ++ concatMap (\(f:(s:(n:_))) -> swapPerson f s n) singleSwapped
+            where singleSwapped = swapPerson first second neutral
+        swapPerson first second neutral = foldl' (\acc p -> recombine p (delete p first) ++ acc) [] first -- get all possible swaps between the first and second group
             where
                 recombine p ps = foldl' (\acc (u, us) -> [p:us, u:ps, neutral]:acc) [] secondRemoved -- combine this removal from the first group with every possible removal from the second group
                 secondRemoved = removeSinglePerson second -- get all possible removals from the second group
