@@ -5,7 +5,8 @@
     -- Usage: ludoInteractive OR ludoStatistic roundCount
     -- ludoStatistic 1000
 
-import Control.DeepSeq
+import Control.Exception (evaluate)
+import Control.DeepSeq (force)
 import Control.Monad (when, void)
 import Data.Maybe (fromJust)
 import System.Environment (getArgs)
@@ -81,7 +82,7 @@ playRounds s = (!!) $ iterate (creditWinner $ playRound s) $ pure (0, 0)
             w <- winner <$> r
             (aw, bw) <- sc
             let nsc = if name w == name (currentPlayer s) then (aw + 1, bw) else (aw, bw + 1)
-            return $! force nsc -- force evaluation to prevent long chains of additions
+            evaluate $ force nsc -- force evaluation to prevent long chains of additions
 
 ludoInteractive :: IO ()
 ludoInteractive = print =<< playRound (InProgress True (Player "A" 1 Nothing Nothing 0) $ Player "B" 8 (Just Bad) Nothing 0)
@@ -96,8 +97,4 @@ ludoStatistic rc = do
         where printWins p w = putStr $ name p ++ " has won " ++ show w ++ " round(s) using the " ++ (show . fromJust . strat $ p) ++ " strategy.\n"
 
 main :: IO ()
-main = do
-    args <- getArgs
-    if null args
-        then ludoInteractive
-        else ludoStatistic . read $ head args
+main = (\args -> if null args then ludoInteractive else ludoStatistic . read $ head args) =<< getArgs
