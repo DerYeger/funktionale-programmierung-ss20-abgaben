@@ -5,6 +5,7 @@
     -- Usage: ludoInteractive OR ludoStatistic roundCount
     -- ludoStatistic 1000
 
+import Control.DeepSeq
 import Control.Monad (when, void)
 import Data.Maybe (fromJust)
 import System.Environment (getArgs)
@@ -75,11 +76,12 @@ playRound s = checkGameOver <$> turn s >>= \ns -> case ns of
             | otherwise = GameOver p
 
 playRounds :: State -> Int -> IO (Int, Int)
-playRounds start = (!!) $ iterate (creditWinner $ playRound start) $ pure (0, 0)   
-    where creditWinner result scores = do
-            w <- winner <$> result
-            (aw, bw) <- scores
-            if name w == name (currentPlayer start) then return ((+) 1 $! aw, bw) else return (aw, (+) 1 $! bw) -- increment strictly to prevent long chains of additions
+playRounds s = (!!) $ iterate (creditWinner $ playRound s) $ pure (0, 0)   
+    where creditWinner r sc = do
+            w <- winner <$> r
+            (aw, bw) <- sc
+            let nsc = if name w == name (currentPlayer s) then (aw + 1, bw) else (aw, bw + 1) -- increment strictly to prevent long chains of additions
+            return $ force nsc
 
 ludoInteractive :: IO ()
 ludoInteractive = print =<< playRound (InProgress True (Player "A" 1 Nothing Nothing 0) $ Player "B" 8 (Just Bad) Nothing 0)
