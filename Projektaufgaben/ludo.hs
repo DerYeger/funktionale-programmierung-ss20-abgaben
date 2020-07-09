@@ -55,7 +55,7 @@ turn s@(InProgress ii cp op) d = do
   when ii printTurn
   if isJust (location cp) && location op == Just (onField $ d + fromJust (location cp))
     then applyStrat s d <$> getStrat cp -- new location is same field as opponent
-    else return $! InProgress ii op (move cp d) -- just move. return strictly, because the result will be inspected anyway
+    else return InProgress ii op (move cp d) -- just move
   where
     printTurn = putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n"
 
