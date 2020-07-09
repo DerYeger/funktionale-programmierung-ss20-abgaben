@@ -59,7 +59,7 @@ playRound :: State -> IO State
 playRound s = (\ns@(InProgress _ _ p) -> if stepsTaken p < fieldSize then playRound ns else return $ GameOver p) =<< turn s =<< randomRIO (1, 6)
 
 playRounds :: State -> Int -> IO (Int, Int)
-playRounds s = (!!) $ iterate (creditWinner $ playRound s) $ pure (0, 0)   
+playRounds s = (!!) . iterate (creditWinner $ playRound s) $ pure (0, 0)   
     where creditWinner r sc = do
             w <- winner <$> r
             (aw, bw) <- sc
