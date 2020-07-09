@@ -1,5 +1,7 @@
 -- Compilation: ghc -main-is Groups groups.hs
     -- Execution: groups wishes.txt
+-- GHCi: ghci groups.hs
+    -- Usage: :main wishes.txt
 
 module Groups (main) where
 
