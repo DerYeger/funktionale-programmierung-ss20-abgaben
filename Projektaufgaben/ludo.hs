@@ -3,7 +3,7 @@
     -- Execution: ludo [statisticRoundCount]
 -- GHCi: stack ghci ludo.hs
     -- Usage: ludoInteractive OR ludoStatistic roundCount
-    -- ludoStatistic 1000
+        -- ludoStatistic 1000
 
 import Control.DeepSeq (force)
 import Control.Exception (evaluate)
@@ -55,7 +55,7 @@ turn s@(InProgress ii cp op) d = do
   when ii printTurn
   if isJust (location cp) && location op == Just (onField $ d + fromJust (location cp))
     then applyStrat s d <$> getStrat cp -- new location is same field as opponent
-    else return InProgress ii op (move cp d) -- just move
+    else return $ InProgress ii op (move cp d) -- just move
   where
     printTurn = putStr $ show s ++ "\n" ++ name cp ++ " has rolled a " ++ show d ++ ".\n\n"
 
