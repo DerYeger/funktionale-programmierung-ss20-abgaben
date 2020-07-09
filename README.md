@@ -76,7 +76,7 @@ Threads können Werte ablegen oder herausnehmen, wobei sie blockiert werden fall
 ### Software Transactional Memory
 
 Bei STM werden `TVars` in STM-Monaden modifiziert.
-Dies passiert atomar, weshalb weder eine Verwendung von IO oder `MVar` verboten ist.
+Dies passiert atomar, weshalb eine Verwendung von IO oder `MVar` verboten ist.
 
 ### Eval Monade
 
