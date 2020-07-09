@@ -45,11 +45,7 @@ applyStrat (InProgress ii cp op) d strat = case strat of
 
 getStrat :: Player -> IO Strategy
 getStrat (Player _ _ (Just s) _ _) = return s
-getStrat _ = do
-    putStr "Select your strategy (Bad == Bad, Otherwise == Nice)\n"
-    s <- getLine
-    putStr "\n"
-    if s == "Bad" then return Bad else return Nice
+getStrat _ = putStr "Select your strategy (Bad == Bad, Otherwise == Nice)\n" >> getLine >>= (\s -> putStr "\n" >> if s == "Bad" then return Bad else return Nice)
 
 turn :: State -> Int -> IO State
 turn s@(InProgress ii cp op) d = do
