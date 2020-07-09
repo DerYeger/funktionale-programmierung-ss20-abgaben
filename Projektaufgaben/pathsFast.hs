@@ -5,7 +5,7 @@
     -- pathsFast 2 4 0 0 1 3 123 456 789
     -- pathsFast 2 4 0 0 1 2 5 5 5
 
-module PathsFast where
+module PathsFast (pathsFast) where
 
 import Data.List (foldl')
 

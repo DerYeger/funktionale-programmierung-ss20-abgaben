@@ -5,7 +5,7 @@
     -- pathsShort 2 4 0 0 1 3 123 456 789
     -- pathsShort 2 4 0 0 1 2 5 5 5
 
-module PathsShort where
+module PathsShort (pathsShort) where
 
 import Data.List (foldl')
 import Data.Maybe (catMaybes)

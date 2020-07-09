@@ -7,7 +7,7 @@
 
 import Control.Exception (evaluate)
 import Control.DeepSeq (force)
-import Control.Monad (when, void)
+import Control.Monad (when)
 import Data.Maybe (fromJust, isJust)
 import System.Environment (getArgs)
 import System.Random (randomRIO)

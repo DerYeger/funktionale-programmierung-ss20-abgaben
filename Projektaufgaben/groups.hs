@@ -1,7 +1,7 @@
 -- Compilation: ghc -main-is Groups groups.hs
 -- Execution: groups wishes.txt
 
-module Groups where
+module Groups (main) where
 
 import Control.Monad (void)
 import Data.List (delete, foldl', maximumBy, sortOn)
