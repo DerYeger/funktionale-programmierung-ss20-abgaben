@@ -21,15 +21,15 @@ type Group = [Person]
 data Solution = Solution {groups :: [Group], score :: Int}
   deriving (Show)
 
-wishScores :: [Int]
-wishScores = [10, 5, 1]
+sumBy :: (Foldable f) => (a -> Int) -> f a -> Int
+sumBy f = foldl' (flip $ (+) . f) 0
 
 totalScore :: [Group] -> Int
-totalScore = foldl' (\acc g -> acc + groupScore g) 0
+totalScore = sumBy groupScore
   where
-    groupScore g = foldl' personScore 0 g
+    groupScore g = sumBy personScore g
       where
-        personScore acc (Person _ ws) = foldl' (+) acc $ zipWith checkWish ws wishScores
+        personScore (Person _ ws) = sum $ zipWith checkWish ws [10, 5, 1]
         checkWish w s = if foldr (\x acc -> name x == w || acc) False g then s else 0
 
 asSolution :: [Group] -> Solution
