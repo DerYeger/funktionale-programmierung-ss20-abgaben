@@ -8,7 +8,6 @@
 module PathsShort (pathsShort) where
 
 import Data.List (foldl')
-import Data.Maybe (catMaybes)
 
 data Step = Step {y :: Int, x :: Int, val :: Int, score :: Int}
 
