@@ -32,9 +32,9 @@ buildRow m i z1 z2 z3 = foldl' next (z1, z2, []) [0 .. m -1]
        in ((cz1 + z3) `mod` 100, (cz2 * z3) `mod` 100, xs ++ [x])
 
 pathsFast :: Int -> Int -> Int -> Int -> Int -> Int -> Int -> Int -> Int -> [[Step]]
-pathsFast n m ys xs yt xt z1 z2 z3 = map reverse $ paths [[Step ys xs sVal sVal]]
+pathsFast n m sy sx ty tx z1 z2 z3 = map reverse $ paths [[Step sy sx sVal sVal]]
   where
-    sVal = (arr !! ys) !! xs
+    sVal = (arr !! sy) !! sx
     arr = buildArray n m z1 z2 z3
     paths ps
       | null ps = []
@@ -42,12 +42,12 @@ pathsFast n m ys xs yt xt z1 z2 z3 = map reverse $ paths [[Step ys xs sVal sVal]
       | otherwise = paths $ concatMap nextSteps ps
     nextSteps steps@(Step y x _ cScore : _) = foldl' validStep [] [(-1, 0, div), (0, -1, (-)), (1, 0, (*)), (0, 1, (+))]
       where
-        validStep acc (yd, xd, op) = if isInRange && noPrematureEnd && score step >= 0 && step `notElem` steps then (step : steps) : acc else acc
+        validStep acc (dy, dx, op) = if isInRange && noPrematureEnd && score step >= 0 && step `notElem` steps then (step : steps) : acc else acc
           where
-            ny = y + yd
-            nx = x + xd
+            ny = y + dy
+            nx = x + dx
             isInRange = 0 <= ny && ny < n && 0 <= nx && nx < m
-            noPrematureEnd = ny /= yt || nx /= xt || length steps == n * m - 1
+            noPrematureEnd = ny /= ty || nx /= tx || length steps == n * m - 1
             step = Step ny nx nVal (cScore `op` nVal)
               where
                 nVal = (arr !! ny) !! nx
