@@ -44,7 +44,7 @@ Funktionen können (offensichtlich) keine Mitglied dieser Typklasse sein.
 
 #### Ord (Ordering) 
 
-Ein diskreter Typ, d. h. Typ der Klasse num mit den Werten GT, LT, EQ
+Ein diskreter Typ, d. h. Typ der Klasse Enum mit den Werten GT, LT, EQ
 
 #### Enum 
 
