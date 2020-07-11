@@ -19,6 +19,15 @@ Haskell verwendet Call-by-name sowie Sharing durch Pointer.
 Dadurch ist es möglich auf potentiell unendlich großen Datenstrukturen zu arbeiten.
 Des Weiteren werden so nur tatsächlich benötigte Ausdrücke evaluiert und dies auch nur einmal.
 
+#### Innermost evaluation
+
+Auswertung beginnt beim innersten Redex. Innermost (mit Zusatzregel) heisst call-by-value
+
+
+#### Outermost evaluation
+
+Auswertung beginnt beim äußersten Redex. Outermost (mit Zusatzregel) heisst call-by-name
+
 ### Typinferenz
 
 Der Haskell-Compiler kann Typen automatisch inferieren, wodurch eine Verwendung von einer Art generischen Typvariablen möglich ist.
