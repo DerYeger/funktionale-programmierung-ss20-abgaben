@@ -53,7 +53,7 @@ getMoveNeighbours s
 getSwapNeighbours :: Solution -> [[Group]]
 getSwapNeighbours (Solution [xs, ys, zs] _) = allSwaps xs ys zs ++ allSwaps xs zs ys ++ allSwaps ys zs xs
   where
-    allSwaps first second neutral = singleSwapped ++ concatMap (\(f : s : n : _) -> swapPerson f s n) singleSwapped
+    allSwaps first second neutral = singleSwapped ++ concatMap (\[f, s, n] -> swapPerson f s n) singleSwapped
       where
         singleSwapped = swapPerson first second neutral
     swapPerson first second neutral = foldl' (\acc p -> recombine p (delete p first) ++ acc) [] first -- get all possible swaps between the first and second group
