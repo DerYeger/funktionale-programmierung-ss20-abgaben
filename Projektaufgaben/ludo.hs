@@ -1,7 +1,7 @@
 -- Requires System.Random to be installed
 -- Compilation: stack ghc ludo.hs
     -- Execution: ludo [statisticRoundCount]
--- GHCi: stack ghci ludo.hs
+-- GHCi: stack ghci --ghci-options ludo.hs
     -- Usage: ludoInteractive OR ludoStatistic roundCount
         -- ludoStatistic 1000
 
