@@ -28,6 +28,10 @@ Auswertung beginnt beim innersten Redex. Innermost (mit Zusatzregel) heisst call
 
 Auswertung beginnt beim äußersten Redex. Outermost (mit Zusatzregel) heisst call-by-name
 
+#### Auswertung unter Lambdas
+
+Funktionen werden als Blackbox betrachtet, sodass Redex erst nach der Anwendung der Lambda-Funktion ausgewertet werden können. 
+
 ### Typinferenz
 
 Der Haskell-Compiler kann Typen automatisch inferieren, wodurch eine Verwendung von einer Art generischen Typvariablen möglich ist.
