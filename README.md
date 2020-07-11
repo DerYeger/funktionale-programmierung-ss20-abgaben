@@ -38,11 +38,17 @@ Ein Thunk ist ein nicht-evaluierter Ausdruck.
 Typklassen spezifizieren Schnittstellen zu Operationen und sind mit Interfaces vergleichbar.
 Die Zugehörigkeit eines Typs zu einer Typklassen ist von dessen Definition getrennt.
 
-#### Eq: Funktionen können (offensichtlich) keine Mitglied dieser Typklasse sein.
+#### Eq 
 
-#### Ord (Ordering): ein diskreter Typ, d. h. Typ der Klasse num mit den Werten GT, LT, EQ
+Funktionen können (offensichtlich) keine Mitglied dieser Typklasse sein.
 
-#### Enum: enthält Fload und Double.
+#### Ord (Ordering) 
+
+Ein diskreter Typ, d. h. Typ der Klasse num mit den Werten GT, LT, EQ
+
+#### Enum 
+
+Enthält Fload und Double.
 
 ### newtyp
 
