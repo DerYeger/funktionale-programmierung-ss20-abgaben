@@ -96,7 +96,8 @@ Threads werden mit Hilfe von Funktionen wie `forkIO` erzeugt und können auf gem
 
 `MVars` sind Haskells Grundbaustein der Synchronisation und Kommunikation.
 Threads können Werte ablegen oder herausnehmen, wobei sie blockiert werden falls die `MVar` voll bzw. leer ist.
-Über die Methode `modifyMVar` ist zudem die Implementierung eines kritischen Abschnitts möglich.
+Über die Methode `modifyMVar` ist zudem die Implementierung eines kritischen Abschnitts möglich. 
+Entspricht FIFO. Hält zu einem gegenen Zeitpunkt nur ein Nachricht (message).
 
 ### Software Transactional Memory
 
